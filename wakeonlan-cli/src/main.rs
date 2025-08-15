@@ -4,7 +4,7 @@
 mod types;
 mod utils;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use configura::{load_config, Config};
@@ -13,7 +13,7 @@ use inquire::{Confirm, InquireError, Select, Text};
 use std::{process::exit, str::FromStr};
 use types::{Data, Machine};
 use utils::{format_machine_details, validate_mac, validate_text};
-use wakeonlan::Mac;
+use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -29,6 +29,14 @@ struct App {
         help = "This tells the CLI to use the name as the MAC address to send the magic packet to"
     )]
     name_as_mac: bool,
+
+    #[arg(
+        short = 'b',
+        long = "broadcast_addr",
+        help = "The broadcast address to send the magic packet to (must be `IP:PORT` format)",
+        default_value = "255.255.255.255:9"
+    )]
+    addr: String,
 
     #[command(subcommand)]
     command: Option<Command>,
@@ -53,6 +61,7 @@ fn main() {
 fn run() -> Result<()> {
     let args = App::parse();
     let mut config: Data = load_config().context("Failed to load config file")?;
+    let addr = args.addr;
 
     match args.name {
         Some(name) => {
@@ -75,7 +84,7 @@ fn run() -> Result<()> {
                 }
             };
 
-            wake_machine(&machine).context("Failed to wake machine")?;
+            wake_machine(&machine, &addr).context("Failed to wake machine")?;
         }
 
         None => match args.command {
@@ -89,7 +98,7 @@ fn run() -> Result<()> {
 
                 let machines = config.machines;
                 match Select::new("Choose a machine to wake up:", machines).prompt() {
-                    Ok(mach) => wake_machine(&mach).context("Failed to wake machine")?,
+                    Ok(mach) => wake_machine(&mach, &addr).context("Failed to wake machine")?,
                     Err(InquireError::OperationInterrupted | InquireError::OperationCanceled) => {
                         return Ok(())
                     }
@@ -185,7 +194,7 @@ impl Data {
     }
 }
 
-fn wake_machine(machine: &Machine) -> Result<()> {
+fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
     Mac::from_str(&machine.mac)?;
 
     println!(
@@ -197,5 +206,10 @@ fn wake_machine(machine: &Machine) -> Result<()> {
         },
         machine.mac.cyan()
     );
+
+    let packet =
+        create_magic_packet(&machine.mac).map_err(|e: wakeonlan::MacAddressError| anyhow!(e))?;
+
+    send_magic_packet_to_broadcast_address(&packet, addr).context("Failed to send magic packet")?;
     Ok(())
 }
