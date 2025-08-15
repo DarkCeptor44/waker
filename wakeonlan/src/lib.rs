@@ -117,7 +117,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "MAC address must be 6 bytes long, got 5")]
+    #[should_panic(expected = "InvalidLength(5)")]
     fn test_invalid_mac_length() {
         let mac_bytes: [u8; 5] = [0x01, 0x23, 0x45, 0x67, 0x89];
 
@@ -125,8 +125,15 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Invalid MAC address format: 01:23:45:67:89")]
+    #[should_panic(expected = r#"InvalidMacAddress("01:23:45:67:89")"#)]
     fn test_invalid_mac_str() {
         create_magic_packet("01:23:45:67:89").unwrap();
+    }
+
+    #[test]
+    fn test_mac_display() {
+        let mac = Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]);
+
+        assert_eq!(mac.to_string(), "01:23:45:67:89:ab");
     }
 }
