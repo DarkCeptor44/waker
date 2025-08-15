@@ -49,3 +49,34 @@ fn create_magic_packet_impl(addr: &[u8]) -> Result<MagicPacket> {
 
     Ok(MagicPacket { data: packet })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_magic_packet_from_bytes() {
+        let mac_bytes: [u8; 6] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xAB];
+        let packet = create_magic_packet(mac_bytes).unwrap();
+
+        assert_eq!(
+            packet.data,
+            vec![
+                255, 255, 255, 255, 255, 255, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171,
+                1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1,
+                35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35,
+                69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69,
+                103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103,
+                137, 171, 1, 35, 69, 103, 137, 171
+            ]
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "MAC address must be 6 bytes long, got 5")]
+    fn test_invalid_mac_length() {
+        let mac_bytes: [u8; 5] = [0x01, 0x23, 0x45, 0x67, 0x89];
+
+        create_magic_packet(mac_bytes).unwrap();
+    }
+}
