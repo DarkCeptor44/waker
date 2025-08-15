@@ -129,11 +129,4 @@ mod tests {
     fn test_invalid_mac_str() {
         create_magic_packet("01:23:45:67:89").unwrap();
     }
-
-    #[test]
-    fn test_mac_display() {
-        let mac = Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]);
-
-        assert_eq!(mac.to_string(), "01:23:45:67:89:ab");
-    }
 }

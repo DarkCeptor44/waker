@@ -1,5 +1,5 @@
 use crate::MacAddressError;
-use std::{convert::Infallible, fmt::Display, str::FromStr};
+use std::{convert::Infallible, fmt, str::FromStr};
 
 /// A trait for types that can be converted into a MAC address byte array
 pub trait AsMacBytes {
@@ -123,12 +123,47 @@ impl FromStr for Mac {
     }
 }
 
-impl Display for Mac {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Mac {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::LowerHex::fmt(self, f)
+    }
+}
+
+impl fmt::LowerHex for Mac {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
             self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]
         )
+    }
+}
+
+impl fmt::UpperHex for Mac {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}",
+            self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_mac_display_lower() {
+        let mac = Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]);
+
+        assert_eq!(mac.to_string(), "01:23:45:67:89:ab");
+    }
+
+    #[test]
+    fn test_mac_display_upper() {
+        let mac = Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]);
+
+        assert_eq!(format!("{mac:X}"), "01:23:45:67:89:AB");
     }
 }
