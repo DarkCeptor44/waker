@@ -34,7 +34,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 ///
 /// ## Examples
 ///
-/// Create a magic packet from a MAC address string (separated by either `:`, `-`, or `.`)
+/// Create a magic packet from a MAC address string (separated by either `:`, `-`, or `.`):
 ///
 /// ```rust
 /// use wakeonlan::create_magic_packet;
@@ -42,7 +42,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 /// let _ = create_magic_packet("01:23:45:67:89:AB").unwrap();
 /// ```
 ///
-/// Create a magic packet from a byte array of length 6
+/// Create a magic packet from a byte array of length 6:
 ///
 /// ```rust
 /// use wakeonlan::create_magic_packet;
@@ -50,7 +50,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 /// let _ = create_magic_packet([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]).unwrap();
 /// ```
 ///
-/// Create a magic packet from a byte slice of any length, as long as it can be converted to a 6-byte array
+/// Create a magic packet from a byte slice of any length, as long as it can be converted to a 6-byte array:
 ///
 /// ```rust
 /// use wakeonlan::create_magic_packet;
@@ -58,7 +58,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 /// let _ = create_magic_packet(&[0x01, 0x23, 0x45, 0x67, 0x89, 0xAB][..]).unwrap();
 /// ```
 ///
-/// Create a magic packet from a [`Mac`] struct
+/// Create a magic packet from a [`Mac`] struct:
 ///
 /// ```rust
 /// use std::str::FromStr;
