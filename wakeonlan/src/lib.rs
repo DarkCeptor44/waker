@@ -1,6 +1,55 @@
 //! # wakeonlan
 //!
 //! A Rust library for creating and sending Wake-on-LAN (WoL) magic packets over the network.
+//!
+//! ## Installation
+//!
+//! You can add this library as a dependency with the following command:
+//!
+//! ```bash
+//! cargo add wakeonlan
+//! ```
+//!
+//! Or you can add this to your `Cargo.toml` file:
+//!
+//! ```toml
+//! [dependencies]
+//! wakeonlan = "^0.1"
+//! ```
+//!
+//! ## Usage
+//!
+//! To wake a machine you will need the MAC address (it can also be called physical or hardware address) for its network interface, then you just need to create a magic packet and send it to the broadcast address, by default it's usually `255.255.255.255:9` so you can just use [`send_magic_packet`], if you want to send it to a specific broadcast address you can use [`send_magic_packet_to_broadcast_address`].
+//!
+//! The easiest way to create a magic packet is to use [`create_magic_packet`]:
+//!
+//! ```rust
+//! use wakeonlan::create_magic_packet;
+//!
+//! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+//! ```
+//!
+//! The MAC address can be passed as either [`&str`](str), [`String`], a byte array of length 6 ([`[u8; 6]`](u8)) or a byte slice ([`&[u8]`](u8)). Currently the string MAC address must have its bytes separated but `:`, `.` or `-` are all supported as separators.
+//!
+//! The magic packet can then be sent using [`send_magic_packet`]:
+//!
+//! ```rust,no_run
+//! use wakeonlan::{create_magic_packet, send_magic_packet};
+//!
+//! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+//!
+//! send_magic_packet(&packet).unwrap();
+//! ```
+//!
+//! To send the packet to a specific broadcast address you can use [`send_magic_packet_to_broadcast_address`] (note that the address must be in the format `IP:PORT`):
+//!
+//! ```rust,no_run
+//! use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address};
+//!
+//! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+//!
+//! send_magic_packet_to_broadcast_address(&packet, "192.168.0.255:9").unwrap();
+//! ```
 
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, missing_debug_implementations, missing_docs)]
