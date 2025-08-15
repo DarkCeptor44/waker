@@ -2,15 +2,17 @@
 #![warn(clippy::pedantic)]
 
 mod types;
+mod utils;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use configura::{load_config, Config};
 use handy::pattern::{is_close_to_upper_bound, string_similarity};
-use inquire::{validator::Validation, Confirm, InquireError, Select, Text};
+use inquire::{Confirm, InquireError, Select, Text};
 use std::{process::exit, str::FromStr};
 use types::{Data, Machine};
+use utils::{format_machine_details, validate_mac, validate_text};
 use wakeonlan::Mac;
 
 #[derive(Debug, Parser)]
@@ -180,31 +182,6 @@ impl Data {
         };
 
         Ok(Some(Machine { name, mac }))
-    }
-}
-
-fn format_machine_details(machine: &Machine) -> String {
-    format!(
-        "\nName: {}\nMAC: {}\n",
-        machine.name.green(),
-        machine.mac.cyan()
-    )
-}
-
-#[allow(clippy::unnecessary_wraps)]
-fn validate_mac(input: &str) -> Result<Validation, Box<dyn std::error::Error + Send + Sync>> {
-    match Mac::from_str(input) {
-        Ok(_) => Ok(Validation::Valid),
-        Err(e) => Ok(Validation::Invalid(e.to_string().into())),
-    }
-}
-
-#[allow(clippy::unnecessary_wraps)]
-fn validate_text(input: &str) -> Result<Validation, Box<dyn std::error::Error + Send + Sync>> {
-    if input.trim().is_empty() {
-        Ok(Validation::Invalid("Field cannot be empty".into()))
-    } else {
-        Ok(Validation::Valid)
     }
 }
 
