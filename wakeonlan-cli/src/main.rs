@@ -3,17 +3,15 @@
 
 mod types;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use configura::{load_config, Config};
 use handy::pattern::{is_close_to_upper_bound, string_similarity};
 use inquire::{validator::Validation, Confirm, InquireError, Select, Text};
 use std::{process::exit, str::FromStr};
-use types::Data;
+use types::{Data, Machine};
 use wakeonlan::Mac;
-
-use crate::types::Machine;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -37,13 +35,7 @@ struct App {
 #[derive(Debug, Subcommand)]
 enum Command {
     #[command(about = "Add machine to the config file", alias = "a")]
-    Add {
-        #[arg(short, long, help = "Name of the machine to add")]
-        name: Option<String>,
-
-        #[arg(short, long, help = "MAC address of the machine to add")]
-        mac: Option<String>,
-    },
+    Add,
 }
 
 fn main() {
@@ -82,9 +74,7 @@ fn run() -> Result<()> {
         }
 
         None => match args.command {
-            Some(Command::Add { name, mac }) => config
-                .add_machine(name, mac)
-                .context("Failed to add machine")?,
+            Some(Command::Add) => config.add_machine().context("Failed to add machine")?,
 
             None => {
                 if config.machines.is_empty() {
@@ -108,7 +98,7 @@ fn run() -> Result<()> {
 }
 
 impl Data {
-    fn add_machine(&mut self, name_opt: Option<String>, mac_opt: Option<String>) -> Result<()> {
+    fn add_machine(&mut self) -> Result<()> {
         let Some(machine) = self
             .prompt_machine(None)
             .context("Failed to prompt a machine")?
