@@ -1,0 +1,9 @@
+[package]
+name = "wakeonlan-cli"
+version = "0.1.0"
+description = "Wake-On-LAN command line interface for Rust"
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+anyhow.workspace = true
