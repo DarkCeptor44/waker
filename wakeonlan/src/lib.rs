@@ -1,4 +1,4 @@
-//! # wol
+//! # wakeonlan
 //!
 //! A Rust library for creating and sending Wake-on-LAN (WoL) magic packets over the network.
 
