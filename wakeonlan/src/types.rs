@@ -59,6 +59,26 @@ impl AsMacBytes for &str {
     }
 }
 
+impl AsMacBytes for String {
+    type Error = MacAddressError;
+
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error> {
+        let mac_addr = Mac::from_str(self.as_str())?;
+
+        Ok(mac_addr.0)
+    }
+}
+
+impl AsMacBytes for &String {
+    type Error = MacAddressError;
+
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error> {
+        let mac_addr = Mac::from_str(self.as_str())?;
+
+        Ok(mac_addr.0)
+    }
+}
+
 /// Represents a Wake-on-LAN magic packet
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MagicPacket(pub Vec<u8>);
