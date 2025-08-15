@@ -6,11 +6,13 @@
 #![warn(clippy::pedantic, missing_debug_implementations, missing_docs)]
 #![allow(clippy::doc_markdown)]
 
+mod errors;
 mod types;
 
 use anyhow::Result;
 
-pub use types::{IntoMacBytes, Mac, MagicPacket};
+pub use errors::MacAddressError;
+pub use types::{AsMacBytes, Mac, MagicPacket};
 
 /// Creates a Wake-on-LAN magic packet for the given MAC address
 ///
@@ -66,9 +68,9 @@ pub use types::{IntoMacBytes, Mac, MagicPacket};
 /// let _ = create_magic_packet(Mac::from_str("01:23:45:67:89:AB").unwrap()).unwrap();
 /// ```
 #[allow(clippy::needless_pass_by_value)]
-pub fn create_magic_packet<T>(mac_address: T) -> Result<MagicPacket>
+pub fn create_magic_packet<T>(mac_address: T) -> Result<MagicPacket, T::Error>
 where
-    T: IntoMacBytes,
+    T: AsMacBytes,
 {
     let mac_bytes = mac_address.as_mac_bytes()?;
 

@@ -1,8 +1,11 @@
-use anyhow::anyhow;
-use std::{fmt::Display, str::FromStr};
+use crate::MacAddressError;
+use std::{convert::Infallible, fmt::Display, str::FromStr};
 
 /// A trait for types that can be converted into a MAC address byte array
-pub trait IntoMacBytes {
+pub trait AsMacBytes {
+    /// The error type returned by the conversion
+    type Error;
+
     /// Converts the implementing type into a MAC address byte array
     ///
     /// ## Returns
@@ -12,22 +15,23 @@ pub trait IntoMacBytes {
     /// ## Errors
     ///
     /// Returns an error if the conversion fails
-    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error>;
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error>;
 }
 
-impl IntoMacBytes for Mac {
-    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+impl AsMacBytes for Mac {
+    type Error = Infallible;
+
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error> {
         Ok(self.0)
     }
 }
 
-impl IntoMacBytes for &[u8] {
-    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+impl AsMacBytes for &[u8] {
+    type Error = MacAddressError;
+
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error> {
         if self.len() != 6 {
-            return Err(anyhow!(
-                "MAC address must be 6 bytes long, got {}",
-                self.len()
-            ));
+            return Err(MacAddressError::InvalidLength(self.len()));
         }
 
         let mut mac_bytes = [0u8; 6];
@@ -37,15 +41,20 @@ impl IntoMacBytes for &[u8] {
     }
 }
 
-impl IntoMacBytes for [u8; 6] {
-    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+impl AsMacBytes for [u8; 6] {
+    type Error = Infallible;
+
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error> {
         Ok(*self)
     }
 }
 
-impl IntoMacBytes for &str {
-    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+impl AsMacBytes for &str {
+    type Error = MacAddressError;
+
+    fn as_mac_bytes(&self) -> Result<[u8; 6], Self::Error> {
         let mac_addr = Mac::from_str(self)?;
+
         Ok(mac_addr.0)
     }
 }
@@ -71,14 +80,11 @@ impl From<[u8; 6]> for Mac {
 }
 
 impl TryFrom<&[u8]> for Mac {
-    type Error = anyhow::Error;
+    type Error = MacAddressError;
 
     fn try_from(value: &[u8]) -> std::result::Result<Self, Self::Error> {
         if value.len() != 6 {
-            return Err(anyhow!(
-                "MAC address must be exactly 6 bytes long, got {}",
-                value.len()
-            ));
+            return Err(MacAddressError::InvalidLength(value.len()));
         }
 
         let mut bytes = [0u8; 6];
@@ -89,7 +95,7 @@ impl TryFrom<&[u8]> for Mac {
 }
 
 impl TryFrom<&str> for Mac {
-    type Error = anyhow::Error;
+    type Error = MacAddressError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         value.parse()
@@ -97,20 +103,20 @@ impl TryFrom<&str> for Mac {
 }
 
 impl FromStr for Mac {
-    type Err = anyhow::Error;
+    type Err = MacAddressError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         let s_clean = s.trim().replace(['-', '_', '.'], ":");
         let parts: Vec<&str> = s_clean.split(':').collect();
 
         if parts.len() != 6 {
-            return Err(anyhow!("Invalid MAC address format: {s}"));
+            return Err(MacAddressError::InvalidMacAddress(s.to_string()));
         }
 
         let mut buf = [0u8; 6];
         for (i, part) in parts.iter().enumerate() {
             buf[i] = u8::from_str_radix(part, 16)
-                .map_err(|_| anyhow!("Invalid byte in MAC address: {part}"))?;
+                .map_err(|_| MacAddressError::InvalidByteInMac((*part).to_string()))?;
         }
 
         Ok(Self(buf))
