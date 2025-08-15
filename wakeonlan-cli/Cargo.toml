@@ -3,6 +3,7 @@ name = "wakeonlan-cli"
 version = "0.1.0"
 description = "Wake-On-LAN command line interface for Rust"
 edition.workspace = true
+rust-version = "1.80"
 authors.workspace = true
 
 [dependencies]
