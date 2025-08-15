@@ -103,6 +103,18 @@ fn create_magic_packet_impl(addr: [u8; 6]) -> MagicPacket {
 /// ## Errors
 ///
 /// Returns an error if the UDP socket cannot be bound, if the broadcast option cannot be set, or if sending the packet fails
+///
+/// ## Example
+///
+/// Create a magic packet and send it to the default broadcast address (`255.255.255.255:9`):
+///
+/// ```rust,no_run
+/// use wakeonlan::{create_magic_packet, send_magic_packet};
+///
+/// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+///
+/// send_magic_packet(&packet).unwrap();
+/// ```
 pub fn send_magic_packet(packet: &MagicPacket) -> Result<()> {
     send_magic_packet_impl(packet, "255.255.255.255:9")
 }
@@ -123,6 +135,19 @@ pub fn send_magic_packet(packet: &MagicPacket) -> Result<()> {
 /// ## Errors
 ///
 /// Returns an error if the UDP socket cannot be bound, if the broadcast option cannot be set, or if sending the packet fails
+///
+/// /// ## Example
+///
+/// Create a magic packet and send it to a specific broadcast address:
+///
+/// ```rust,no_run
+/// use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address};
+///
+/// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+/// let addr = "192.168.0.255:9"; // Replace with your broadcast address and port
+///
+/// send_magic_packet_to_broadcast_address(&packet, addr).unwrap();
+/// ```
 pub fn send_magic_packet_to_broadcast_address<S>(
     packet: &MagicPacket,
     broadcast_address: S,
