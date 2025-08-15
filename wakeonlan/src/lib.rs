@@ -9,7 +9,8 @@
 mod errors;
 mod types;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
+use std::net::UdpSocket;
 
 pub use errors::MacAddressError;
 pub use types::{AsMacBytes, Mac, MagicPacket};
@@ -89,9 +90,67 @@ fn create_magic_packet_impl(addr: [u8; 6]) -> MagicPacket {
     MagicPacket(packet)
 }
 
+/// Sends a Wake-on-LAN magic packet to the default broadcast address (`255.255.255.255:9`)
+///
+/// ## Arguments
+///
+/// * `packet` - A reference to a [`MagicPacket`] that you want to send
+///
+/// ## Returns
+///
+/// A [`Result`] indicating success or failure of the operation
+///
+/// ## Errors
+///
+/// Returns an error if the UDP socket cannot be bound, if the broadcast option cannot be set, or if sending the packet fails
+pub fn send_magic_packet(packet: &MagicPacket) -> Result<()> {
+    send_magic_packet_impl(packet, "255.255.255.255:9")
+}
+
+/// Sends a Wake-on-LAN magic packet to the specified broadcast address.
+///
+/// This function is for advanced users, for most cases you should use [`send_magic_packet`] instead.
+///
+/// ## Arguments
+///
+/// * `packet` - A reference to a [`MagicPacket`] that you want to send
+/// * `broadcast_address` - A string slice representing the broadcast address and port, e.g., `"192.168.0.255:9"`
+///
+/// ## Returns
+///
+/// A [`Result`] indicating success or failure of the operation
+///
+/// ## Errors
+///
+/// Returns an error if the UDP socket cannot be bound, if the broadcast option cannot be set, or if sending the packet fails
+pub fn send_magic_packet_to_broadcast_address<S>(
+    packet: &MagicPacket,
+    broadcast_address: S,
+) -> Result<()>
+where
+    S: AsRef<str>,
+{
+    send_magic_packet_impl(packet, broadcast_address.as_ref())
+}
+
+/// Sends a Wake-on-LAN magic packet to the specified address
+fn send_magic_packet_impl(packet: &MagicPacket, addr: &str) -> Result<()> {
+    let socket = UdpSocket::bind("0.0.0.0:0").context("Failed to bind UDP socket")?;
+
+    socket
+        .set_broadcast(true)
+        .context("Failed to set socket to broadcast")?;
+    socket
+        .send_to(&packet.0, addr)
+        .context("Failed to send magic packet")?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::Duration;
 
     const EXPECTED_PACKET: [u8; 102] = [
         255, 255, 255, 255, 255, 255, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35,
@@ -128,5 +187,29 @@ mod tests {
     #[should_panic(expected = r#"InvalidMacAddress("01:23:45:67:89")"#)]
     fn test_invalid_mac_str() {
         create_magic_packet("01:23:45:67:89").unwrap();
+    }
+
+    #[test]
+    fn test_send_magic_packet() {
+        let rec_socket = UdpSocket::bind("127.0.0.1:0").expect("Failed to bind receiving socket");
+        rec_socket
+            .set_read_timeout(Some(Duration::from_millis(100)))
+            .expect("Failed to set read timeout");
+        let rec_addr = rec_socket
+            .local_addr()
+            .expect("Failed to get local address");
+
+        let mac = Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]);
+        let packet = create_magic_packet(mac).expect("Failed to create magic packet");
+
+        send_magic_packet_to_broadcast_address(&packet, rec_addr.to_string())
+            .expect("Failed to send magic packet");
+
+        let mut buffer = [0u8; 102];
+        rec_socket
+            .recv_from(&mut buffer)
+            .expect("Failed to receive magic packet");
+
+        assert_eq!(buffer, EXPECTED_PACKET);
     }
 }
