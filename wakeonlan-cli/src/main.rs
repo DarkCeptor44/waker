@@ -36,6 +36,9 @@ struct App {
 enum Command {
     #[command(about = "Add machine to the config file", alias = "a")]
     Add,
+    // TODO add Edit command
+    // TODO add List command
+    // TODO add Remove command
 }
 
 fn main() {
