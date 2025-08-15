@@ -8,68 +8,110 @@
 
 mod types;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 
-pub use types::MagicPacket;
+pub use types::{IntoMacBytes, Mac, MagicPacket};
 
 /// Creates a Wake-on-LAN magic packet for the given MAC address
 ///
 /// ## Arguments
 ///
-/// * `mac_address` - A byte slice representing the MAC address. It must be exactly 6 bytes long
+/// * `mac_address` - A type that can be converted into a [`Mac`] struct, like:
+///   - A string slice: `"01:23:45:67:89:AB"`
+///   - A byte array of length 6: `[0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]`
+///   - A byte slice: `&[0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]`
 ///
 /// ## Returns
 ///
-/// A [`MagicPacket`] containing the Wake-on-LAN magic packet data
+/// A [`Result`] containing the [`MagicPacket`] on success, on an error if the MAC address is invalid
 ///
 /// ## Errors
 ///
-/// Returns an error if the MAC address is not exactly 6 bytes long
+/// Returns an error if the MAC address is invalid
+///
+/// ## Examples
+///
+/// Create a magic packet from a MAC address string (separated by either `:`, `-`, or `.`)
+///
+/// ```rust
+/// use wakeonlan::create_magic_packet;
+///
+/// let _ = create_magic_packet("01:23:45:67:89:AB").unwrap();
+/// ```
+///
+/// Create a magic packet from a byte array of length 6
+///
+/// ```rust
+/// use wakeonlan::create_magic_packet;
+///
+/// let _ = create_magic_packet([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]).unwrap();
+/// ```
+///
+/// Create a magic packet from a byte slice of any length, as long as it can be converted to a 6-byte array
+///
+/// ```rust
+/// use wakeonlan::create_magic_packet;
+///
+/// let _ = create_magic_packet(&[0x01, 0x23, 0x45, 0x67, 0x89, 0xAB][..]).unwrap();
+/// ```
+///
+/// Create a magic packet from a [`Mac`] struct
+///
+/// ```rust
+/// use std::str::FromStr;
+/// use wakeonlan::{create_magic_packet, Mac};
+///
+/// let _ = create_magic_packet(Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB])).unwrap();
+/// // or
+/// let _ = create_magic_packet(Mac::from_str("01:23:45:67:89:AB").unwrap()).unwrap();
+/// ```
+#[allow(clippy::needless_pass_by_value)]
 pub fn create_magic_packet<T>(mac_address: T) -> Result<MagicPacket>
 where
-    T: AsRef<[u8]>,
+    T: IntoMacBytes,
 {
-    create_magic_packet_impl(mac_address.as_ref())
+    let mac_bytes = mac_address.as_mac_bytes()?;
+
+    Ok(create_magic_packet_impl(mac_bytes))
 }
 
-fn create_magic_packet_impl(addr: &[u8]) -> Result<MagicPacket> {
-    if addr.len() != 6 {
-        return Err(anyhow!(
-            "MAC address must be 6 bytes long, got {}",
-            addr.len()
-        ));
-    }
-
+/// Creates a Wake-on-LAN magic packet from a 6-byte MAC address array
+fn create_magic_packet_impl(addr: [u8; 6]) -> MagicPacket {
     let mut packet: Vec<u8> = vec![0xFF; 6];
     packet.reserve(96);
 
     for _ in 0..16 {
-        packet.extend_from_slice(addr);
+        packet.extend_from_slice(&addr);
     }
 
-    Ok(MagicPacket { data: packet })
+    MagicPacket(packet)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    const EXPECTED_PACKET: [u8; 102] = [
+        255, 255, 255, 255, 255, 255, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35,
+        69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137,
+        171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35,
+        69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137,
+        171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171,
+    ];
+
+    #[test]
+    fn test_create_magic_packet_from_str() {
+        let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+
+        assert_eq!(packet.0, EXPECTED_PACKET);
+    }
+
     #[test]
     fn test_create_magic_packet_from_bytes() {
         let mac_bytes: [u8; 6] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xAB];
         let packet = create_magic_packet(mac_bytes).unwrap();
 
-        assert_eq!(
-            packet.data,
-            vec![
-                255, 255, 255, 255, 255, 255, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171,
-                1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1,
-                35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35,
-                69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69,
-                103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103, 137, 171, 1, 35, 69, 103,
-                137, 171, 1, 35, 69, 103, 137, 171
-            ]
-        );
+        assert_eq!(packet.0, EXPECTED_PACKET);
     }
 
     #[test]
@@ -77,6 +119,12 @@ mod tests {
     fn test_invalid_mac_length() {
         let mac_bytes: [u8; 5] = [0x01, 0x23, 0x45, 0x67, 0x89];
 
-        create_magic_packet(mac_bytes).unwrap();
+        create_magic_packet(&mac_bytes[..]).unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "Invalid MAC address format: 01:23:45:67:89")]
+    fn test_invalid_mac_str() {
+        create_magic_packet("01:23:45:67:89").unwrap();
     }
 }

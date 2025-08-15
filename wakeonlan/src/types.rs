@@ -1,12 +1,128 @@
+use anyhow::anyhow;
+use std::{fmt::Display, str::FromStr};
+
+/// A trait for types that can be converted into a MAC address byte array
+pub trait IntoMacBytes {
+    /// Converts the implementing type into a MAC address byte array
+    ///
+    /// ## Returns
+    ///
+    /// A [`Result`] containing the MAC address as a byte array on success, on an error if the conversion fails
+    ///
+    /// ## Errors
+    ///
+    /// Returns an error if the conversion fails
+    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error>;
+}
+
+impl IntoMacBytes for Mac {
+    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+        Ok(self.0)
+    }
+}
+
+impl IntoMacBytes for &[u8] {
+    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+        if self.len() != 6 {
+            return Err(anyhow!(
+                "MAC address must be 6 bytes long, got {}",
+                self.len()
+            ));
+        }
+
+        let mut mac_bytes = [0u8; 6];
+        mac_bytes.copy_from_slice(&self[0..6]);
+
+        Ok(mac_bytes)
+    }
+}
+
+impl IntoMacBytes for [u8; 6] {
+    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+        Ok(*self)
+    }
+}
+
+impl IntoMacBytes for &str {
+    fn as_mac_bytes(&self) -> Result<[u8; 6], anyhow::Error> {
+        let mac_addr = Mac::from_str(self)?;
+        Ok(mac_addr.0)
+    }
+}
+
 /// Represents a Wake-on-LAN magic packet
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MagicPacket {
-    /// The raw data of the magic packet
-    pub data: Vec<u8>,
-}
+pub struct MagicPacket(pub Vec<u8>);
 
 impl AsRef<[u8]> for MagicPacket {
     fn as_ref(&self) -> &[u8] {
-        &self.data
+        &self.0
+    }
+}
+
+/// Represents a MAC address
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Mac(pub [u8; 6]);
+
+impl From<[u8; 6]> for Mac {
+    fn from(value: [u8; 6]) -> Self {
+        Self(value)
+    }
+}
+
+impl TryFrom<&[u8]> for Mac {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &[u8]) -> std::result::Result<Self, Self::Error> {
+        if value.len() != 6 {
+            return Err(anyhow!(
+                "MAC address must be exactly 6 bytes long, got {}",
+                value.len()
+            ));
+        }
+
+        let mut bytes = [0u8; 6];
+        bytes.copy_from_slice(value);
+
+        Ok(Self(bytes))
+    }
+}
+
+impl TryFrom<&str> for Mac {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        value.parse()
+    }
+}
+
+impl FromStr for Mac {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        let s_clean = s.trim().replace(['-', '_', '.'], ":");
+        let parts: Vec<&str> = s_clean.split(':').collect();
+
+        if parts.len() != 6 {
+            return Err(anyhow!("Invalid MAC address format: {s}"));
+        }
+
+        let mut buf = [0u8; 6];
+        for (i, part) in parts.iter().enumerate() {
+            buf[i] = u8::from_str_radix(part, 16)
+                .map_err(|_| anyhow!("Invalid byte in MAC address: {part}"))?;
+        }
+
+        Ok(Self(buf))
+    }
+}
+
+impl Display for Mac {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+            self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]
+        )
     }
 }
