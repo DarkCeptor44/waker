@@ -1,0 +1,9 @@
+[package]
+name = "wakeonlan"
+version = "0.1.0"
+description = "Wake-On-LAN library for Rust"
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+anyhow.workspace = true
