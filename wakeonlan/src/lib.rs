@@ -68,8 +68,8 @@
 //! ```text
 //! Timer precision: 100 ns
 //! packet_creation                     fastest       │ slowest       │ median        │ mean          │ samples │ iters
-//! ├─ create_magic_packet_from_bytes   110.6 ns      │ 144.2 ns      │ 122.4 ns      │ 122.3 ns      │ 100     │ 12800
-//! ╰─ create_magic_packet_from_string  337.2 ns      │ 462.2 ns      │ 343.5 ns      │ 346.5 ns      │ 100     │ 3200
+//! ├─ create_magic_packet_from_bytes   123.1 ns      │ 137.2 ns      │ 123.9 ns      │ 124.3 ns      │ 100     │ 12800
+//! ╰─ create_magic_packet_from_string  131 ns        │ 152.1 ns      │ 132.5 ns      │ 132.6 ns      │ 100     │ 12800
 //! ```
 //!
 //! ### Packet Send
