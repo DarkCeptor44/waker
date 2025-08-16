@@ -50,6 +50,33 @@
 //!
 //! send_magic_packet_to_broadcast_address(&packet, "192.168.0.255:9").unwrap();
 //! ```
+//!
+//! ## Benchmarks
+//!
+//! ### MAC-related
+//!
+//! ```text
+//! Timer precision: 100 ns
+//! mac                        fastest       │ slowest       │ median        │ mean          │ samples │ iters
+//! ╰─ create_mac_from_string  235.6 ns      │ 271.6 ns      │ 241.9 ns      │ 242.2 ns      │ 100     │ 6400
+//! ```
+//!
+//! ### Packet Creation
+//!
+//! ```text
+//! Timer precision: 100 ns
+//! packet_creation                     fastest       │ slowest       │ median        │ mean          │ samples │ iters
+//! ├─ create_magic_packet_from_bytes   110.6 ns      │ 144.2 ns      │ 122.4 ns      │ 122.3 ns      │ 100     │ 12800
+//! ╰─ create_magic_packet_from_string  337.2 ns      │ 462.2 ns      │ 343.5 ns      │ 346.5 ns      │ 100     │ 3200
+//! ```
+//!
+//! ### Packet Send
+//!
+//! ```text
+//! Timer precision: 100 ns
+//! packet_send           fastest       │ slowest       │ median        │ mean          │ samples │ iters
+//! ╰─ send_magic_packet  77.59 µs      │ 232.6 µs      │ 81.64 µs      │ 83.85 µs      │ 100     │ 100
+//! ```
 
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, missing_debug_implementations, missing_docs)]
