@@ -9,3 +9,18 @@ authors.workspace = true
 [dependencies]
 anyhow.workspace = true
 thiserror = "^2"
+
+[dev-dependencies]
+divan = "^0.1"
+
+[[bench]]
+name = "mac"
+harness = false
+
+[[bench]]
+name = "packet_creation"
+harness = false
+
+[[bench]]
+name = "packet_send"
+harness = false
