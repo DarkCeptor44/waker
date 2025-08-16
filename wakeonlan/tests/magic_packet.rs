@@ -33,7 +33,7 @@ fn test_create_magic_packet_panics_on_invalid_mac_length() {
 }
 
 #[test]
-#[should_panic(expected = r#"InvalidMacAddress("01:23:45:67:89")"#)]
+#[should_panic(expected = "InvalidLength(14)")]
 fn test_create_magic_packet_panics_on_invalid_mac_str() {
     create_magic_packet("01:23:45:67:89").unwrap();
 }
