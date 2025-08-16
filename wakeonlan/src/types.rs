@@ -1,4 +1,4 @@
-use crate::MacAddressError;
+use crate::{hex_val, MacAddressError};
 use std::{convert::Infallible, fmt, str::FromStr};
 
 /// A trait for types that can be converted into a MAC address byte array
@@ -126,20 +126,35 @@ impl FromStr for Mac {
     type Err = MacAddressError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        let s_clean = s.trim().replace(['-', '_', '.'], ":");
-        let parts: Vec<&str> = s_clean.split(':').collect();
+        let s = s.trim();
+        let mut bytes = [0u8; 6];
+        let mut s_chars = s.chars().peekable();
 
-        if parts.len() != 6 {
-            return Err(MacAddressError::InvalidMacAddress(s.to_string()));
+        for (i, byte_ref) in bytes.iter_mut().enumerate() {
+            let c1 = s_chars
+                .next()
+                .ok_or(MacAddressError::InvalidLength(s.len()))?;
+            let c2 = s_chars
+                .next()
+                .ok_or(MacAddressError::InvalidLength(s.len()))?;
+
+            let val = (hex_val(c1)? << 4) | hex_val(c2)?;
+            *byte_ref = val;
+
+            if i < 5 {
+                match s_chars.next() {
+                    Some(c) if c == ':' || c == '-' || c == '_' || c == '.' => {}
+                    Some(_) => return Err(MacAddressError::InvalidMacAddress(s.to_string())),
+                    None => return Err(MacAddressError::InvalidLength(s.len())),
+                }
+            }
         }
 
-        let mut buf = [0u8; 6];
-        for (i, part) in parts.iter().enumerate() {
-            buf[i] = u8::from_str_radix(part, 16)
-                .map_err(|_| MacAddressError::InvalidByteInMac((*part).to_string()))?;
+        if s_chars.next().is_some() {
+            return Err(MacAddressError::InvalidLength(s.len()));
         }
 
-        Ok(Self(buf))
+        Ok(Self(bytes))
     }
 }
 
