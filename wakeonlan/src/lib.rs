@@ -97,6 +97,10 @@
 //! ╰─ send_magic_packet  77.59 µs      │ 232.6 µs      │ 81.64 µs      │ 83.85 µs      │ 100     │ 100
 //! ```
 //!
+//! ## MSRV
+//!
+//! The Minimum Supported Rust Version (MSRV) for `wakeonlan` is **1.78**.
+//!
 //! ## License
 //!
 //! This project is licensed under the [Lesser GNU Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html).

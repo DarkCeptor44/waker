@@ -17,6 +17,10 @@ Or you can add this to your `Cargo.toml` file:
 wakeonlan = "^0.1"
 ```
 
+## MSRV
+
+The Minimum Supported Rust Version (MSRV) for `wakeonlan` is **1.78**.
+
 ## Usage
 
 To wake a machine you will need the MAC address (it can also be called physical or hardware address) for its network interface, then you just need to create a magic packet and send it to the broadcast address, by default it's usually `255.255.255.255:9` so you can just use `send_magic_packet`, if you want to send it to a specific broadcast address you can use `send_magic_packet_to_broadcast_address`.
