@@ -58,7 +58,9 @@
 //! ```text
 //! Timer precision: 100 ns
 //! mac                        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-//! ╰─ create_mac_from_string  235.6 ns      │ 271.6 ns      │ 241.9 ns      │ 242.2 ns      │ 100     │ 6400
+//! ├─ create_mac_from_string  14.01 ns      │ 16.45 ns      │ 14.11 ns      │ 14.19 ns      │ 100     │ 102400
+//! ├─ hex_val                 1.969 ns      │ 2.701 ns      │ 1.981 ns      │ 1.998 ns      │ 100     │ 819200
+//! ╰─ u8_from_str_radix       1.542 ns      │ 1.81 ns       │ 1.554 ns      │ 1.552 ns      │ 100     │ 819200
 //! ```
 //!
 //! ### Packet Creation
