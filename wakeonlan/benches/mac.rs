@@ -13,3 +13,13 @@ fn create_mac_from_string() {
     let res = Mac::from_str(black_box(MAC_STRING));
     black_box(res.expect("Failed to create MAC"));
 }
+
+#[divan::bench]
+fn hex_val() {
+    black_box(wakeonlan::hex_val(black_box('0')).expect("Failed to create MAC"));
+}
+
+#[divan::bench]
+fn u8_from_str_radix() {
+    black_box(u8::from_str_radix(black_box("0"), 16).expect("Failed to create MAC"));
+}
