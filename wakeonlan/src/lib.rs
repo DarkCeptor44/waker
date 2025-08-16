@@ -1,3 +1,20 @@
+// Copyright (C) 2025 DarkCeptor44
+//
+// This file is part of wakeonlan.
+//
+// wakeonlan is free software: you can redistribute it and/or modify
+// it under theterms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// wakeonlan is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with wakeonlan.  If not, see <https://www.gnu.org/licenses/>.
+
 //! # wakeonlan
 //!
 //! A Rust library for creating and sending Wake-on-LAN (WoL) magic packets over the network.
@@ -79,6 +96,10 @@
 //! packet_send           fastest       │ slowest       │ median        │ mean          │ samples │ iters
 //! ╰─ send_magic_packet  77.59 µs      │ 232.6 µs      │ 81.64 µs      │ 83.85 µs      │ 100     │ 100
 //! ```
+//!
+//! ## License
+//!
+//! This project is licensed under the [Lesser GNU Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html).
 
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, missing_debug_implementations, missing_docs)]
