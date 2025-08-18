@@ -48,7 +48,7 @@ struct App {
 
     #[arg(
         short = 'b',
-        long = "broadcast_addr",
+        long = "bcast_addr",
         help = "The broadcast address to send the magic packet to (must be `IP:PORT` format)",
         default_value = "255.255.255.255:9"
     )]
