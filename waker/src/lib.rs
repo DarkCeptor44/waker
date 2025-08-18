@@ -275,6 +275,8 @@ where
 fn wake_device_impl(options: WakeOptions) -> Result<()> {
     let socket = UdpSocket::bind(&*options.bind_address).context("Failed to bind UDP socket")?;
 
+    // TODO implement secure_on
+
     socket
         .set_broadcast(true)
         .context("Failed to set socket to broadcast")?;
