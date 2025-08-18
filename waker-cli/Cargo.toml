@@ -19,5 +19,5 @@ tabela = "^0.2"
 waker = { version = "^0.1", path = "../waker", features = ["serde"] }
 
 [[bin]]
-name = "waker"
+name = "wake"
 path = "src/main.rs"
