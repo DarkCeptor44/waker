@@ -47,12 +47,20 @@ struct App {
     name_as_mac: bool,
 
     #[arg(
-        short = 'b',
-        long = "bcast-addr",
+        short,
+        long,
         help = "The broadcast address to send the magic packet to (must be `IP:PORT` format)",
         default_value = "255.255.255.255:9"
     )]
-    addr: String,
+    bcast_addr: String,
+
+    #[arg(
+        short = 'B',
+        long,
+        help = "The address to bind the UDP socket to (must be `IP:PORT` format)",
+        default_value = "0.0.0.0:0"
+    )]
+    bind_addr: String,
 
     #[command(subcommand)]
     command: Option<Command>,
@@ -77,7 +85,6 @@ fn main() {
 fn run() -> Result<()> {
     let args = App::parse();
     let mut config: Data = load_config().context("Failed to load config file")?;
-    let addr = args.addr;
 
     match args.name {
         Some(name) => {
@@ -100,7 +107,8 @@ fn run() -> Result<()> {
                 }
             };
 
-            wake_machine(&machine, &addr).context("Failed to wake machine")?;
+            wake_machine(&machine, &args.bcast_addr, &args.bind_addr)
+                .context("Failed to wake machine")?;
         }
 
         None => match args.command {
@@ -114,7 +122,8 @@ fn run() -> Result<()> {
 
                 let machines = config.machines;
                 match Select::new("Choose a machine to wake up:", machines).prompt() {
-                    Ok(mach) => wake_machine(&mach, &addr).context("Failed to wake machine")?,
+                    Ok(mach) => wake_machine(&mach, &args.bcast_addr, &args.bind_addr)
+                        .context("Failed to wake machine")?,
                     Err(InquireError::OperationInterrupted | InquireError::OperationCanceled) => {
                         return Ok(())
                     }
@@ -213,7 +222,7 @@ impl Data {
     }
 }
 
-fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
+fn wake_machine(machine: &Machine, bcast_addr: &str, bind_addr: &str) -> Result<()> {
     println!(
         "Waking up machine{} with MAC address {}...",
         if machine.name.is_empty() {
@@ -226,7 +235,11 @@ fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
 
     let packet = create_magic_packet(machine.mac)?;
 
-    wake_device(WakeOptions::new(&packet).broadcast_address(addr))
-        .context("Failed to wake device")?;
+    wake_device(
+        WakeOptions::new(&packet)
+            .broadcast_address(bcast_addr)
+            .bind_address(bind_addr),
+    )
+    .context("Failed to wake device")?;
     Ok(())
 }
