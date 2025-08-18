@@ -29,7 +29,7 @@ use inquire::{Confirm, InquireError, Select, Text};
 use std::{process::exit, str::FromStr};
 use types::{Data, Machine};
 use utils::{format_machine_details, validate_mac, validate_text};
-use waker::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
+use waker::{create_magic_packet, wake_device, Mac, WakeOptions};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -226,6 +226,7 @@ fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
 
     let packet = create_magic_packet(machine.mac)?;
 
-    send_magic_packet_to_broadcast_address(&packet, addr).context("Failed to send magic packet")?;
+    wake_device(WakeOptions::new(&packet).broadcast_address(addr))
+        .context("Failed to wake device")?;
     Ok(())
 }
