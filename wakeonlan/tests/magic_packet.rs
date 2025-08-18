@@ -75,3 +75,23 @@ fn test_send_magic_packet() {
 
     assert_eq!(buffer, EXPECTED_PACKET);
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn test_magic_packet_serde_serialize() {
+    use wakeonlan::MagicPacket;
+
+    let packet = MagicPacket(EXPECTED_PACKET.to_vec());
+    let s = serde_json::to_string(&packet).expect("Failed to serialize magic packet");
+    assert_eq!(s, format!("{:?}", EXPECTED_PACKET).replace(" ", ""));
+}
+
+#[test]
+#[cfg(feature = "serde")]
+fn test_magic_packet_serde_deserialize() {
+    use wakeonlan::MagicPacket;
+
+    let s = format!("{:?}", EXPECTED_PACKET).replace(" ", "");
+    let packet: MagicPacket = serde_json::from_str(&s).expect("Failed to deserialize magic packet");
+    assert_eq!(packet.0, EXPECTED_PACKET);
+}

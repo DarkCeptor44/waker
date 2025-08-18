@@ -37,3 +37,19 @@ fn test_mac_display_upper() {
     let mac = Mac(MAC_BYTES);
     assert_eq!(format!("{mac:X}"), "01:23:45:67:89:AB");
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn test_mac_serde_serialize() {
+    let mac = Mac(MAC_BYTES);
+    let s = serde_json::to_string(&mac).expect("Failed to serialize MAC address");
+    assert_eq!(s, format!("\"{mac}\""));
+}
+
+#[test]
+#[cfg(feature = "serde")]
+fn test_mac_serde_deserialize() {
+    let s = "\"01:23:45:67:89:AB\"";
+    let mac: Mac = serde_json::from_str(s).expect("Failed to deserialize MAC address");
+    assert_eq!(mac, Mac(MAC_BYTES));
+}

@@ -720,6 +720,8 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "divan",
+ "serde",
+ "serde_json",
  "thiserror",
 ]
 

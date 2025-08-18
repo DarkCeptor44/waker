@@ -17,6 +17,10 @@ Or you can add this to your `Cargo.toml` file:
 wakeonlan = "^0.1"
 ```
 
+## Features
+
+- `serde`: Enables serialization and deserialization of the `Mac` and `MagicPacket` types.
+
 ## MSRV
 
 The Minimum Supported Rust Version (MSRV) for `wakeonlan` is **1.78**.

@@ -98,6 +98,7 @@ impl AsMacBytes for &String {
 
 /// Represents a Wake-on-LAN magic packet
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MagicPacket(pub Vec<u8>);
 
 impl AsRef<[u8]> for MagicPacket {
@@ -198,5 +199,26 @@ impl fmt::UpperHex for Mac {
             "{:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}",
             self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]
         )
+    }
+}
+
+#[cfg(feature = "serde")]
+impl serde::Serialize for Mac {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de> for Mac {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse::<Mac>().map_err(serde::de::Error::custom)
     }
 }
