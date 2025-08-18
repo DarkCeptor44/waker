@@ -16,7 +16,7 @@
 // along with waker.  If not, see <https://www.gnu.org/licenses/>.
 
 use std::{net::UdpSocket, time::Duration};
-use waker::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
+use waker::{create_magic_packet, wake_device, Mac, WakeOptions};
 
 const MAC_BYTES: [u8; 6] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xAB];
 const EXPECTED_PACKET: [u8; 102] = [
@@ -53,7 +53,7 @@ fn test_create_magic_packet_panics_on_invalid_mac_str() {
 }
 
 #[test]
-fn test_send_magic_packet() {
+fn test_wake_device() {
     let rec_socket = UdpSocket::bind("127.0.0.1:0").expect("Failed to bind receiving socket");
     rec_socket
         .set_read_timeout(Some(Duration::from_millis(100)))
@@ -65,8 +65,8 @@ fn test_send_magic_packet() {
     let mac = Mac(MAC_BYTES);
     let packet = create_magic_packet(mac).expect("Failed to create magic packet");
 
-    send_magic_packet_to_broadcast_address(&packet, rec_addr.to_string())
-        .expect("Failed to send magic packet");
+    wake_device(WakeOptions::new(&packet).broadcast_address(rec_addr.to_string()))
+        .expect("Failed to wake device");
 
     let mut buffer = [0u8; 102];
     rec_socket

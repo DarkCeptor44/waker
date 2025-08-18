@@ -40,7 +40,7 @@
 //!
 //! ## Usage
 //!
-//! To wake a machine you will need the MAC address (it can also be called physical or hardware address) for its network interface, then you just need to create a magic packet and send it to the broadcast address, by default it's usually `255.255.255.255:9` so you can just use [`send_magic_packet`], if you want to send it to a specific broadcast address you can use [`send_magic_packet_to_broadcast_address`].
+//! To wake a machine you will need the MAC address (it can also be called physical or hardware address) for its network interface, then you just need to create a magic packet and send it to the broadcast address, by default it's usually `255.255.255.255:9` so you can just use [`wake_device`], if you want to send it to a specific broadcast address you can pass a [`WakeOptions`] struct.
 //!
 //! The easiest way to create a magic packet is to use [`create_magic_packet`]:
 //!
@@ -52,24 +52,22 @@
 //!
 //! The MAC address can be passed as either [`&str`](str), [`String`], a byte array of length 6 ([`[u8; 6]`](u8)) or a byte slice ([`&[u8]`](u8)). Currently the string MAC address must have its bytes separated but `:`, `.` or `-` are all supported as separators.
 //!
-//! The magic packet can then be sent using [`send_magic_packet`]:
+//! The magic packet can then be sent using [`wake_device`]:
 //!
 //! ```rust,no_run
-//! use waker::{create_magic_packet, send_magic_packet};
+//! use waker::{create_magic_packet, wake_device};
 //!
 //! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
-//!
-//! send_magic_packet(&packet).unwrap();
+//! wake_device(&packet).unwrap();
 //! ```
 //!
-//! To send the packet to a specific broadcast address you can use [`send_magic_packet_to_broadcast_address`] (note that the address must be in the format `IP:PORT`):
+//! To send the packet to a specific broadcast address you have to pass a [`WakeOptions`] struct with the address (note that it must be in the format `IP:PORT`):
 //!
 //! ```rust,no_run
-//! use waker::{create_magic_packet, send_magic_packet_to_broadcast_address};
+//! use waker::{create_magic_packet, wake_device, WakeOptions};
 //!
 //! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
-//!
-//! send_magic_packet_to_broadcast_address(&packet, "192.168.0.255:9").unwrap();
+//! wake_device(WakeOptions::new(&packet).broadcast_address("192.168.0.255:9")).unwrap();
 //! ```
 //!
 //! ## Benchmarks
@@ -120,7 +118,7 @@ use anyhow::{Context, Result};
 use std::net::UdpSocket;
 
 pub use errors::MacAddressError;
-pub use types::{AsMacBytes, Mac, MagicPacket};
+pub use types::{AsMacBytes, Mac, MagicPacket, WakeOptions};
 
 /// Creates a Wake-on-LAN magic packet for the given MAC address
 ///
@@ -221,11 +219,11 @@ pub fn hex_val(c: char) -> Result<u8, MacAddressError> {
     }
 }
 
-/// Sends a Wake-on-LAN magic packet to the default broadcast address (`255.255.255.255:9`)
+/// Sends a Wake-on-LAN magic packet to a broadcast address for waking up a specific device
 ///
 /// ## Arguments
 ///
-/// * `packet` - A reference to a [`MagicPacket`] that you want to send
+/// * `options` - A [`WakeOptions`] struct containing the magic packet, broadcast address, and bind address
 ///
 /// ## Returns
 ///
@@ -235,69 +233,53 @@ pub fn hex_val(c: char) -> Result<u8, MacAddressError> {
 ///
 /// Returns an error if the UDP socket cannot be bound, if the broadcast option cannot be set, or if sending the packet fails
 ///
-/// ## Example
+/// ## Examples
 ///
 /// Create a magic packet and send it to the default broadcast address (`255.255.255.255:9`):
 ///
 /// ```rust,no_run
-/// use waker::{create_magic_packet, send_magic_packet};
+/// use waker::{create_magic_packet, wake_device, WakeOptions};
 ///
 /// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
-///
-/// send_magic_packet(&packet).unwrap();
+/// wake_device(&packet).unwrap();
 /// ```
-pub fn send_magic_packet(packet: &MagicPacket) -> Result<()> {
-    send_magic_packet_impl(packet, "255.255.255.255:9")
-}
-
-/// Sends a Wake-on-LAN magic packet to the specified broadcast address.
-///
-/// This function is for advanced users, for most cases you should use [`send_magic_packet`] instead.
-///
-/// ## Arguments
-///
-/// * `packet` - A reference to a [`MagicPacket`] that you want to send
-/// * `broadcast_address` - A string slice representing the broadcast address and port, e.g., `"192.168.0.255:9"`
-///
-/// ## Returns
-///
-/// A [`Result`] indicating success or failure of the operation
-///
-/// ## Errors
-///
-/// Returns an error if the UDP socket cannot be bound, if the broadcast option cannot be set, or if sending the packet fails
-///
-/// /// ## Example
 ///
 /// Create a magic packet and send it to a specific broadcast address:
 ///
 /// ```rust,no_run
-/// use waker::{create_magic_packet, send_magic_packet_to_broadcast_address};
+/// use waker::{create_magic_packet, wake_device, WakeOptions};
 ///
 /// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 /// let addr = "192.168.0.255:9"; // Replace with your broadcast address and port
-///
-/// send_magic_packet_to_broadcast_address(&packet, addr).unwrap();
+/// wake_device(WakeOptions::new(&packet).broadcast_address(addr)).unwrap();
 /// ```
-pub fn send_magic_packet_to_broadcast_address<S>(
-    packet: &MagicPacket,
-    broadcast_address: S,
-) -> Result<()>
+///
+/// Create a magic packet and send it to a specific bind address:
+///
+/// ```rust,no_run
+/// use waker::{create_magic_packet, wake_device, WakeOptions};
+///
+/// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+/// let addr = "0.0.0.0:0"; // Replace with your bind address and port
+/// wake_device(WakeOptions::new(&packet).bind_address(addr)).unwrap();
+/// ```
+pub fn wake_device<'a, O>(options: O) -> Result<()>
 where
-    S: AsRef<str>,
+    O: Into<WakeOptions<'a>>,
 {
-    send_magic_packet_impl(packet, broadcast_address.as_ref())
+    wake_device_impl(options.into())
 }
 
-/// Sends a Wake-on-LAN magic packet to the specified address
-fn send_magic_packet_impl(packet: &MagicPacket, addr: &str) -> Result<()> {
-    let socket = UdpSocket::bind("0.0.0.0:0").context("Failed to bind UDP socket")?;
+/// Sends a Wake-on-LAN magic packet to a broadcast address for waking up a specific device
+#[allow(clippy::needless_pass_by_value)]
+fn wake_device_impl(options: WakeOptions) -> Result<()> {
+    let socket = UdpSocket::bind(&*options.bind_address).context("Failed to bind UDP socket")?;
 
     socket
         .set_broadcast(true)
         .context("Failed to set socket to broadcast")?;
     socket
-        .send_to(&packet.0, addr)
+        .send_to(&options.packet.0, &*options.broadcast_address)
         .context("Failed to send magic packet")?;
 
     Ok(())

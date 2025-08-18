@@ -16,7 +16,7 @@
 // along with waker.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::{hex_val, MacAddressError};
-use std::{convert::Infallible, fmt, str::FromStr};
+use std::{borrow::Cow, convert::Infallible, fmt, str::FromStr};
 
 /// A trait for types that can be converted into a MAC address byte array
 pub trait AsMacBytes {
@@ -220,5 +220,82 @@ impl<'de> serde::Deserialize<'de> for Mac {
     {
         let s = String::deserialize(deserializer)?;
         s.parse::<Mac>().map_err(serde::de::Error::custom)
+    }
+}
+
+/// Wake-on-LAN options
+#[derive(Debug, Clone)]
+pub struct WakeOptions<'a> {
+    /// The packet to send, you can create one with [`create_magic_packet`](crate::create_magic_packet)
+    pub packet: &'a MagicPacket,
+
+    /// The broadcast address to send the magic packet to
+    ///
+    /// Defaults to `"255.255.255.255:9"`
+    pub broadcast_address: Cow<'a, str>,
+
+    /// The address to bind the UDP socket to
+    ///
+    /// Defaults to `"0.0.0.0:0"`
+    pub bind_address: Cow<'a, str>,
+
+    /// The password to use for secure Wake-on-LAN.
+    ///
+    /// **Currently unsupported**
+    pub pass: Option<Cow<'a, str>>,
+}
+
+impl<'a> From<&'a MagicPacket> for WakeOptions<'a> {
+    fn from(packet: &'a MagicPacket) -> Self {
+        Self::new(packet)
+    }
+}
+
+impl<'a> WakeOptions<'a> {
+    /// Creates a new [`WakeOptions`] with the specified magic packet
+    #[must_use]
+    pub fn new(magic_packet: &'a MagicPacket) -> Self {
+        Self {
+            packet: magic_packet,
+            broadcast_address: "255.255.255.255:9".into(),
+            bind_address: "0.0.0.0:0".into(),
+            pass: None,
+        }
+    }
+
+    /// Sets the broadcast address
+    ///
+    /// Defaults to `"255.255.255.255:9"`
+    #[must_use]
+    pub fn broadcast_address<S>(mut self, address: S) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        self.broadcast_address = address.into();
+        self
+    }
+
+    /// Sets the bind address
+    ///
+    /// Defaults to `"0.0.0.0:0"`
+    #[must_use]
+    pub fn bind_address<S>(mut self, address: S) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        self.bind_address = address.into();
+        self
+    }
+
+    /// Sets the secure password for Wake-on-LAN
+    ///
+    /// **Currently unsupported**
+    #[must_use]
+    pub fn secure_on<S>(mut self, password: S) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        self.pass = Some(password.into());
+        self
     }
 }
