@@ -221,7 +221,7 @@ fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
         } else {
             format!(" {}", machine.name.green())
         },
-        machine.mac.to_string().cyan()
+        format!("{:X}", machine.mac).cyan()
     );
 
     let packet = create_magic_packet(machine.mac)?;
