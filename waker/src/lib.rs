@@ -1,21 +1,21 @@
 // Copyright (C) 2025 DarkCeptor44
 //
-// This file is part of wakeonlan.
+// This file is part of waker.
 //
-// wakeonlan is free software: you can redistribute it and/or modify
+// waker is free software: you can redistribute it and/or modify
 // it under theterms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// wakeonlan is distributed in the hope that it will be useful,
+// waker is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with wakeonlan.  If not, see <https://www.gnu.org/licenses/>.
+// along with waker.  If not, see <https://www.gnu.org/licenses/>.
 
-//! # wakeonlan
+//! # waker
 //!
 //! A Rust library for creating and sending Wake-on-LAN (WoL) magic packets over the network.
 //!
@@ -24,14 +24,14 @@
 //! You can add this library as a dependency with the following command:
 //!
 //! ```bash
-//! cargo add wakeonlan
+//! cargo add waker
 //! ```
 //!
 //! Or you can add this to your `Cargo.toml` file:
 //!
 //! ```toml
 //! [dependencies]
-//! wakeonlan = "^0.1"
+//! waker = "^0.1"
 //! ```
 //!
 //! ## Features
@@ -45,7 +45,7 @@
 //! The easiest way to create a magic packet is to use [`create_magic_packet`]:
 //!
 //! ```rust
-//! use wakeonlan::create_magic_packet;
+//! use waker::create_magic_packet;
 //!
 //! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 //! ```
@@ -55,7 +55,7 @@
 //! The magic packet can then be sent using [`send_magic_packet`]:
 //!
 //! ```rust,no_run
-//! use wakeonlan::{create_magic_packet, send_magic_packet};
+//! use waker::{create_magic_packet, send_magic_packet};
 //!
 //! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 //!
@@ -65,7 +65,7 @@
 //! To send the packet to a specific broadcast address you can use [`send_magic_packet_to_broadcast_address`] (note that the address must be in the format `IP:PORT`):
 //!
 //! ```rust,no_run
-//! use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address};
+//! use waker::{create_magic_packet, send_magic_packet_to_broadcast_address};
 //!
 //! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 //!
@@ -103,7 +103,7 @@
 //!
 //! ## MSRV
 //!
-//! The Minimum Supported Rust Version (MSRV) for `wakeonlan` is **1.78**.
+//! The Minimum Supported Rust Version (MSRV) for `waker` is **1.78**.
 //!
 //! ## License
 //!
@@ -144,7 +144,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 /// Create a magic packet from a MAC address string (separated by either `:`, `-`, or `.`):
 ///
 /// ```rust
-/// use wakeonlan::create_magic_packet;
+/// use waker::create_magic_packet;
 ///
 /// let _ = create_magic_packet("01:23:45:67:89:AB").unwrap();
 /// ```
@@ -152,7 +152,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 /// Create a magic packet from a byte array of length 6:
 ///
 /// ```rust
-/// use wakeonlan::create_magic_packet;
+/// use waker::create_magic_packet;
 ///
 /// let _ = create_magic_packet([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB]).unwrap();
 /// ```
@@ -160,7 +160,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 /// Create a magic packet from a byte slice of any length, as long as it can be converted to a 6-byte array:
 ///
 /// ```rust
-/// use wakeonlan::create_magic_packet;
+/// use waker::create_magic_packet;
 ///
 /// let _ = create_magic_packet(&[0x01, 0x23, 0x45, 0x67, 0x89, 0xAB][..]).unwrap();
 /// ```
@@ -169,7 +169,7 @@ pub use types::{AsMacBytes, Mac, MagicPacket};
 ///
 /// ```rust
 /// use std::str::FromStr;
-/// use wakeonlan::{create_magic_packet, Mac};
+/// use waker::{create_magic_packet, Mac};
 ///
 /// let _ = create_magic_packet(Mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB])).unwrap();
 /// // or
@@ -240,7 +240,7 @@ pub fn hex_val(c: char) -> Result<u8, MacAddressError> {
 /// Create a magic packet and send it to the default broadcast address (`255.255.255.255:9`):
 ///
 /// ```rust,no_run
-/// use wakeonlan::{create_magic_packet, send_magic_packet};
+/// use waker::{create_magic_packet, send_magic_packet};
 ///
 /// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 ///
@@ -272,7 +272,7 @@ pub fn send_magic_packet(packet: &MagicPacket) -> Result<()> {
 /// Create a magic packet and send it to a specific broadcast address:
 ///
 /// ```rust,no_run
-/// use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address};
+/// use waker::{create_magic_packet, send_magic_packet_to_broadcast_address};
 ///
 /// let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 /// let addr = "192.168.0.255:9"; // Replace with your broadcast address and port

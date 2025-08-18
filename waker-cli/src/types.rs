@@ -1,4 +1,4 @@
-// wakeonlan-cli
+// waker-cli
 // Copyright (C) 2025 DarkCeptor44
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,9 @@
 use configura::{formats::JsonFormat, Config};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
-use wakeonlan::Mac;
+use waker::Mac;
 
-const CONFIG_NAME: &str = "wol";
+const CONFIG_NAME: &str = "waker";
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
 pub struct Data {

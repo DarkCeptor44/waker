@@ -1,4 +1,4 @@
-// wakeonlan-cli
+// waker-cli
 // Copyright (C) 2025 DarkCeptor44
 //
 // This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ use inquire::{Confirm, InquireError, Select, Text};
 use std::{process::exit, str::FromStr};
 use types::{Data, Machine};
 use utils::{format_machine_details, validate_mac, validate_text};
-use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
+use waker::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]

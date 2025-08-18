@@ -1,22 +1,22 @@
 // Copyright (C) 2025 DarkCeptor44
 //
-// This file is part of wakeonlan.
+// This file is part of waker.
 //
-// wakeonlan is free software: you can redistribute it and/or modify
+// waker is free software: you can redistribute it and/or modify
 // it under theterms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// wakeonlan is distributed in the hope that it will be useful,
+// waker is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with wakeonlan.  If not, see <https://www.gnu.org/licenses/>.
+// along with waker.  If not, see <https://www.gnu.org/licenses/>.
 
 use std::{net::UdpSocket, time::Duration};
-use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
+use waker::{create_magic_packet, send_magic_packet_to_broadcast_address, Mac};
 
 const MAC_BYTES: [u8; 6] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xAB];
 const EXPECTED_PACKET: [u8; 102] = [
@@ -79,7 +79,7 @@ fn test_send_magic_packet() {
 #[test]
 #[cfg(feature = "serde")]
 fn test_magic_packet_serde_serialize() {
-    use wakeonlan::MagicPacket;
+    use waker::MagicPacket;
 
     let packet = MagicPacket(EXPECTED_PACKET.to_vec());
     let s = serde_json::to_string(&packet).expect("Failed to serialize magic packet");
@@ -89,7 +89,7 @@ fn test_magic_packet_serde_serialize() {
 #[test]
 #[cfg(feature = "serde")]
 fn test_magic_packet_serde_deserialize() {
-    use wakeonlan::MagicPacket;
+    use waker::MagicPacket;
 
     let s = format!("{:?}", EXPECTED_PACKET).replace(" ", "");
     let packet: MagicPacket = serde_json::from_str(&s).expect("Failed to deserialize magic packet");

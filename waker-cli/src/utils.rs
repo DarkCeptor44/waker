@@ -1,4 +1,4 @@
-// wakeonlan-cli
+// waker-cli
 // Copyright (C) 2025 DarkCeptor44
 //
 // This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@ use crate::types::Machine;
 use colored::Colorize;
 use inquire::validator::Validation;
 use std::str::FromStr;
-use wakeonlan::Mac;
+use waker::Mac;
 
 pub fn format_machine_details(machine: &Machine) -> String {
     format!(

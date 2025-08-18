@@ -1,4 +1,4 @@
-# wakeonlan-cli
+# waker-cli
 
 A command-line application for sending Wake-on-LAN (WoL) magic packets over the network. It can be used to wake up a machine by its MAC address or by its alias, you can add machines through the CLI and save them to a config file, that way you don't have to memorize their MAC addresses.
 
@@ -10,17 +10,17 @@ You can install the application from:
 
 ## MSRV
 
-The Minimum Supported Rust Version (MSRV) for `wakeonlan-cli` is **1.80**.
+The Minimum Supported Rust Version (MSRV) for `waker-cli` is **1.80**.
 
 ## Usage
 
 ![cli1](./assets/cli1.png)
 
 ```bash
-$ wol --help
+$ waker --help
 Wake-On-LAN command line interface for Rust
 
-Usage: wol [OPTIONS] [NAME] [COMMAND]
+Usage: waker [OPTIONS] [NAME] [COMMAND]
 
 Commands:
   add   Add machine to the config file
@@ -77,7 +77,7 @@ lto = false
 | `wol 01:23:45:67:89:AB` ([swsnr/wol](https://crates.io/crates/wol) v0.3.1 + release) | 3.9 ± 0.2 | 3.6 | 4.5 | 1.00 |
 | **`wol 01:23:45:67:89:AB -n` (v0.1.0 + release)** | 4.1 ± 0.2 | 3.7 | 4.8 | 1.06 ± 0.06 |
 | **`wol 01:23:45:67:89:AB -n` (v0.1.0 + fast)** | 4.6 ± 0.3 | 4.2 | 9.0 | 1.17 ± 0.09 |
-| `wakeonlan 01:23:45:67:89:AB` ([jpoliv/wakeonlan](https://github.com/jpoliv/wakeonlan) v0.41-12.1) | 93.0 ± 0.8 | 92.0 | 94.7 | 23.78 ± 1.04 |
+| `waker 01:23:45:67:89:AB` ([jpoliv/wakeonlan](https://github.com/jpoliv/wakeonlan) v0.41-12.1) | 93.0 ± 0.8 | 92.0 | 94.7 | 23.78 ± 1.04 |
 
 ## License
 

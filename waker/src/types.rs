@@ -1,19 +1,19 @@
 // Copyright (C) 2025 DarkCeptor44
 //
-// This file is part of wakeonlan.
+// This file is part of waker.
 //
-// wakeonlan is free software: you can redistribute it and/or modify
+// waker is free software: you can redistribute it and/or modify
 // it under theterms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// wakeonlan is distributed in the hope that it will be useful,
+// waker is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with wakeonlan.  If not, see <https://www.gnu.org/licenses/>.
+// along with waker.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::{hex_val, MacAddressError};
 use std::{convert::Infallible, fmt, str::FromStr};

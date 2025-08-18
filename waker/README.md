@@ -1,4 +1,4 @@
-# wakeonlan
+# waker
 
 A Rust library for creating and sending Wake-on-LAN (WoL) magic packets over the network.
 
@@ -7,14 +7,14 @@ A Rust library for creating and sending Wake-on-LAN (WoL) magic packets over the
 You can add this library as a dependency with the following command:
 
 ```bash
-cargo add wakeonlan
+cargo add waker
 ```
 
 Or you can add this to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-wakeonlan = "^0.1"
+waker = "^0.1"
 ```
 
 ## Features
@@ -23,7 +23,7 @@ wakeonlan = "^0.1"
 
 ## MSRV
 
-The Minimum Supported Rust Version (MSRV) for `wakeonlan` is **1.78**.
+The Minimum Supported Rust Version (MSRV) for `waker` is **1.78**.
 
 ## Usage
 
@@ -32,7 +32,7 @@ To wake a machine you will need the MAC address (it can also be called physical 
 The easiest way to create a magic packet is to use `create_magic_packet`:
 
 ```rust
-use wakeonlan::create_magic_packet;
+use waker::create_magic_packet;
 
 let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 ```
@@ -42,7 +42,7 @@ The MAC address can be passed as either `&str`, `String`, a byte array of length
 The magic packet can then be sent using `send_magic_packet`:
 
 ```rust,no_run
-use wakeonlan::{create_magic_packet, send_magic_packet};
+use waker::{create_magic_packet, send_magic_packet};
 
 let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 
@@ -52,7 +52,7 @@ send_magic_packet(&packet).unwrap();
 To send the packet to a specific broadcast address you can use `send_magic_packet_to_broadcast_address` (note that the address must be in the format `IP:PORT`):
 
 ```rust,no_run
-use wakeonlan::{create_magic_packet, send_magic_packet_to_broadcast_address};
+use waker::{create_magic_packet, send_magic_packet_to_broadcast_address};
 
 let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 
