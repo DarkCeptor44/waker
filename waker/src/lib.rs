@@ -77,9 +77,9 @@
 //! ```text
 //! Timer precision: 100 ns
 //! mac                        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-//! ├─ create_mac_from_string  14.01 ns      │ 16.45 ns      │ 14.11 ns      │ 14.19 ns      │ 100     │ 102400
-//! ├─ hex_val                 1.969 ns      │ 2.701 ns      │ 1.981 ns      │ 1.998 ns      │ 100     │ 819200
-//! ╰─ u8_from_str_radix       1.542 ns      │ 1.81 ns       │ 1.554 ns      │ 1.552 ns      │ 100     │ 819200
+//! ├─ create_mac_from_string  15.18 ns      │ 21.43 ns      │ 15.28 ns      │ 15.6 ns       │ 100     │ 102400
+//! ├─ hex_val                 1.981 ns      │ 8.5 ns        │ 1.993 ns      │ 2.144 ns      │ 100     │ 819200
+//! ╰─ u8_from_str_radix       1.542 ns      │ 1.554 ns      │ 1.554 ns      │ 1.549 ns      │ 100     │ 819200
 //! ```
 //!
 //! ### Packet Creation
@@ -87,16 +87,16 @@
 //! ```text
 //! Timer precision: 100 ns
 //! packet_creation                     fastest       │ slowest       │ median        │ mean          │ samples │ iters
-//! ├─ create_magic_packet_from_bytes   123.1 ns      │ 137.2 ns      │ 123.9 ns      │ 124.3 ns      │ 100     │ 12800
-//! ╰─ create_magic_packet_from_string  131 ns        │ 152.1 ns      │ 132.5 ns      │ 132.6 ns      │ 100     │ 12800
+//! ├─ create_magic_packet_from_bytes   114.6 ns      │ 138 ns        │ 118.5 ns      │ 118.8 ns      │ 100     │ 12800
+//! ╰─ create_magic_packet_from_string  132.5 ns      │ 186.4 ns      │ 133.3 ns      │ 135.7 ns      │ 100     │ 12800
 //! ```
 //!
 //! ### Packet Send
 //!
 //! ```text
 //! Timer precision: 100 ns
-//! packet_send           fastest       │ slowest       │ median        │ mean          │ samples │ iters
-//! ╰─ send_magic_packet  77.59 µs      │ 232.6 µs      │ 81.64 µs      │ 83.85 µs      │ 100     │ 100
+//! packet_send     fastest       │ slowest       │ median        │ mean          │ samples │ iters
+//! ╰─ wake_device  78.49 µs      │ 268 µs        │ 81.09 µs      │ 84.5 µs       │ 100     │ 100
 //! ```
 //!
 //! ## MSRV
