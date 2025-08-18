@@ -79,6 +79,10 @@
 //! wake_device(WakeOptions::new(&packet).bind_address("127.0.0.1:0")).unwrap();
 //! ```
 //!
+//! ## Audits
+//!
+//! No vulnerabilities found according to [cargo-audit](https://crates.io/crates/cargo-audit/)
+//!
 //! ## Benchmarks
 //!
 //! ### MAC-related

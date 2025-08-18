@@ -66,6 +66,18 @@ let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
 wake_device(WakeOptions::new(&packet).bind_address("127.0.0.1:0")).unwrap();
 ```
 
+## Audits
+
+No vulnerabilities found according to [cargo-audit](https://crates.io/crates/cargo-audit/)
+
+## Testing
+
+You can run the tests with:
+
+```bash
+cargo test --all-features
+```
+
 ## Benchmarks
 
 ### MAC-related
