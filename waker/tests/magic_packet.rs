@@ -77,6 +77,34 @@ fn test_wake_device() {
 }
 
 #[test]
+fn test_wake_device_with_localhost_bind() {
+    let rec_socket = UdpSocket::bind("127.0.0.1:0").expect("Failed to bind receiving socket");
+    rec_socket
+        .set_read_timeout(Some(Duration::from_millis(100)))
+        .expect("Failed to set read timeout");
+    let rec_addr = rec_socket
+        .local_addr()
+        .expect("Failed to get local address");
+
+    let mac = Mac(MAC_BYTES);
+    let packet = create_magic_packet(mac).expect("Failed to create magic packet");
+
+    wake_device(
+        WakeOptions::new(&packet)
+            .broadcast_address(rec_addr.to_string())
+            .bind_address("127.0.0.1:0"),
+    )
+    .expect("Failed to wake device");
+
+    let mut buffer = [0u8; 102];
+    rec_socket
+        .recv_from(&mut buffer)
+        .expect("Failed to receive magic packet");
+
+    assert_eq!(buffer, EXPECTED_PACKET);
+}
+
+#[test]
 #[cfg(feature = "serde")]
 fn test_magic_packet_serde_serialize() {
     use waker::MagicPacket;
