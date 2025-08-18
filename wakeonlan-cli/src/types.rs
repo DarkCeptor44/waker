@@ -17,6 +17,7 @@
 use configura::{formats::JsonFormat, Config};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
+use wakeonlan::Mac;
 
 const CONFIG_NAME: &str = "wol";
 
@@ -37,7 +38,7 @@ impl Config for Data {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Machine {
     pub name: String,
-    pub mac: String,
+    pub mac: Mac,
 }
 
 impl Display for Machine {

@@ -24,7 +24,7 @@ pub fn format_machine_details(machine: &Machine) -> String {
     format!(
         "\nName: {}\nMAC: {}\n",
         machine.name.green(),
-        machine.mac.cyan()
+        machine.mac.to_string().cyan()
     )
 }
 

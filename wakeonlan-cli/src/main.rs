@@ -20,7 +20,7 @@
 mod types;
 mod utils;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use configura::{load_config, Config};
@@ -84,7 +84,7 @@ fn run() -> Result<()> {
             let machine = if args.name_as_mac {
                 Machine {
                     name: String::new(),
-                    mac: name,
+                    mac: Mac::from_str(&name).context("Invalid MAC address")?,
                 }
             } else {
                 if config.machines.is_empty() {
@@ -193,9 +193,9 @@ impl Data {
             return Ok(None);
         }
 
-        let default_mac = existing.map_or("", |m| &m.mac);
+        let default_mac = existing.map_or(String::new(), |m| m.mac.to_string());
         let mac = match Text::new("MAC address:")
-            .with_initial_value(default_mac)
+            .with_initial_value(&default_mac)
             .with_validator(validate_mac)
             .prompt()
         {
@@ -206,13 +206,14 @@ impl Data {
             Err(e) => return Err(e.into()),
         };
 
-        Ok(Some(Machine { name, mac }))
+        Ok(Some(Machine {
+            name,
+            mac: Mac::from_str(&mac).context("Invalid MAC address")?,
+        }))
     }
 }
 
 fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
-    Mac::from_str(&machine.mac)?;
-
     println!(
         "Waking up machine{} with MAC address {}...",
         if machine.name.is_empty() {
@@ -220,11 +221,10 @@ fn wake_machine(machine: &Machine, addr: &str) -> Result<()> {
         } else {
             format!(" {}", machine.name.green())
         },
-        machine.mac.cyan()
+        machine.mac.to_string().cyan()
     );
 
-    let packet =
-        create_magic_packet(&machine.mac).map_err(|e: wakeonlan::MacAddressError| anyhow!(e))?;
+    let packet = create_magic_packet(machine.mac)?;
 
     send_magic_packet_to_broadcast_address(&packet, addr).context("Failed to send magic packet")?;
     Ok(())
