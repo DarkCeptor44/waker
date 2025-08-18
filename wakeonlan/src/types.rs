@@ -108,7 +108,7 @@ impl AsRef<[u8]> for MagicPacket {
 }
 
 /// Represents a MAC address
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Mac(pub [u8; 6]);
 
 impl From<[u8; 6]> for Mac {
