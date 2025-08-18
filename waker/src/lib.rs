@@ -70,6 +70,15 @@
 //! wake_device(WakeOptions::new(&packet).broadcast_address("192.168.0.255:9")).unwrap();
 //! ```
 //!
+//! You can also specify the address to bind the UDP socket to (default is `0.0.0.0:0`):
+//!
+//! ```rust,no_run
+//! use waker::{create_magic_packet, wake_device, WakeOptions};
+//!
+//! let packet = create_magic_packet("01:23:45:67:89:AB").unwrap();
+//! wake_device(WakeOptions::new(&packet).bind_address("127.0.0.1:0")).unwrap();
+//! ```
+//!
 //! ## Benchmarks
 //!
 //! ### MAC-related
