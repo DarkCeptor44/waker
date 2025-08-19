@@ -5,6 +5,7 @@ members = ["waker", "waker-cli"]
 [workspace.package]
 edition = "2021"
 authors = ["DarkCeptor44"]
+repository = "https://github.com/DarkCeptor44/waker"
 
 [workspace.dependencies]
 anyhow = "^1"

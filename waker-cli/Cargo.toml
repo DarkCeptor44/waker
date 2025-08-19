@@ -6,6 +6,10 @@ edition.workspace = true
 rust-version = "1.80"
 authors.workspace = true
 license = "GPL-3.0-or-later"
+homepage = "https://github.com/DarkCeptor44/waker/tree/main/waker-cli"
+repository.workspace = true
+keywords = ["wake-on-lan", "wol", "magic-packet", "wakeonlan"]
+categories = ["command-line-utilities", "network-programming"]
 
 [dependencies]
 anyhow.workspace = true
