@@ -22,6 +22,8 @@
 //!
 //! You can install the application from:
 //!
+//! * [crates.io](https://crates.io/crates/waker-cli): `cargo install waker-cli`
+//! * [GitHub](https://github.com/DarkCeptor44/waker): `cargo install --git https://github.com/DarkCeptor44/waker waker-cli`
 //! * Manually (after cloning the repo locally): `cargo install --path .`
 //!
 //! ## Usage
