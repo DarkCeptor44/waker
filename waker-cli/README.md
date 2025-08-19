@@ -17,10 +17,10 @@ The Minimum Supported Rust Version (MSRV) for `waker-cli` is **1.80**.
 ![cli1](./assets/cli1.png)
 
 ```bash
-$ waker --help
+$ wake --help
 Wake-On-LAN command line interface for Rust
 
-Usage: waker [OPTIONS] [NAME] [COMMAND]
+Usage: wake [OPTIONS] [NAME] [COMMAND]
 
 Commands:
   add   Add machine to the config file
@@ -30,10 +30,11 @@ Arguments:
   [NAME]  Name of the machine to wake up, if the `-n` option is specified then this is the MAC address to send the magic packet to (must be in format `xx:xx:xx:xx:xx:xx`)
 
 Options:
-  -n, --name-as-mac            This tells the CLI to use the name as the MAC address to send the magic packet to
-  -b, --broadcast_addr <ADDR>  The broadcast address to send the magic packet to (must be `IP:PORT` format) [default: 255.255.255.255:9]    
-  -h, --help                   Print help
-  -V, --version                Print version
+  -n, --name-as-mac              This tells the CLI to use the name as the MAC address to send the magic packet to
+  -b, --bcast-addr <BCAST_ADDR>  The broadcast address to send the magic packet to (must be `IP:PORT` format) [default: 255.255.255.255:9]  
+  -B, --bind-addr <BIND_ADDR>    The address to bind the UDP socket to (must be `IP:PORT` format) [default: 0.0.0.0:0]
+  -h, --help                     Print help
+  -V, --version                  Print version
 ```
 
 ## Benchmarks
@@ -64,9 +65,10 @@ lto = false
 
 | Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
 | ------- | --------- | -------- | -------- | -------- |
-| `wol 01:23:45:67:89:AB` ([swsnr/wol](https://crates.io/crates/wol) v0.3.1 + release) | 10.4 ± 3.1 | 8.9 | 47.8 | 1.00 |
-| **`wol 01:23:45:67:89:AB -n` (v0.1.0 + release)** | 15.8 ± 1.4 | 14.4 | 29.3 | 1.53 ± 0.47 |
-| **`wol 01:23:45:67:89:AB -n` (v0.1.0 + fast)** | 16.2 ± 1.9 | 14.6 | 27.6 | 1.56 ± 0.50 |
+| `wol 01:23:45:67:89:AB` ([swsnr/wol](https://crates.io/crates/wol) v0.3.1 + release) | 10.3 ± 0.7 | 9.1 | 13.0 | 1.00 |
+| `wol-rs 01:23:45:67:89:AB` ([fengyc/wol-rs](https://crates.io/crates/wol-rs) v1.1.0 + release) | 10.8 ± 1.5 | 9.5 | 27.9 | 1.05 ± 0.16 |
+| `wake -n 01:23:45:67:89:AB` (v0.1.0 + fast) | 16.3 ± 0.9 | 14.7 | 21.0 | 1.57 ± 0.13 |
+| `wake -n 01:23:45:67:89:AB` (v0.1.0 + release) | 16.3 ± 1.3 | 14.5 | 22.9 | 1.58 ± 0.16 |
 
 ### Linux
 
@@ -74,10 +76,11 @@ lto = false
 
 | Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
 | ------- | --------- | -------- | -------- | -------- |
-| `wol 01:23:45:67:89:AB` ([swsnr/wol](https://crates.io/crates/wol) v0.3.1 + release) | 3.9 ± 0.2 | 3.6 | 4.5 | 1.00 |
-| **`wol 01:23:45:67:89:AB -n` (v0.1.0 + release)** | 4.1 ± 0.2 | 3.7 | 4.8 | 1.06 ± 0.06 |
-| **`wol 01:23:45:67:89:AB -n` (v0.1.0 + fast)** | 4.6 ± 0.3 | 4.2 | 9.0 | 1.17 ± 0.09 |
-| `waker 01:23:45:67:89:AB` ([jpoliv/wakeonlan](https://github.com/jpoliv/wakeonlan) v0.41-12.1) | 93.0 ± 0.8 | 92.0 | 94.7 | 23.78 ± 1.04 |
+| `wol 01:23:45:67:89:AB` ([swsnr/wol](https://crates.io/crates/wol) v0.3.1 + release) | 2.3 ± 0.2 | 2.0 | 3.5 | 1.00 |
+| `wake -n 01:23:45:67:89:AB` (v0.1.0 + release) | 2.6 ± 0.2 | 2.2 | 3.3 | 1.12 ± 0.12 |
+| `wake -n 01:23:45:67:89:AB` (v0.1.0 + fast) | 3.0 ± 0.2 | 2.6 | 4.5 | 1.30 ± 0.14 |
+| `wol-rs 01:23:45:67:89:AB` ([fengyc/wol-rs](https://crates.io/crates/wol-rs) v1.1.0 + release) | 3.5 ± 0.2 | 3.2 | 4.2 | 1.55 ± 0.15 |
+| `wakeonlan 01:23:45:67:89:AB` ([jpoliv/wakeonlan](https://github.com/jpoliv/wakeonlan) v0.41-12.1) | 92.2 ± 6.0 | 89.9 | 124.2 | 40.31 ± 4.26 |
 
 ## License
 
