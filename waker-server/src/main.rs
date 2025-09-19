@@ -1,7 +1,9 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
 
-use anyhow::Result;
+mod server;
+
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use dotenvy::dotenv;
@@ -17,7 +19,7 @@ struct App {
 #[derive(Subcommand)]
 enum Command {
     #[command(about = "Run the server")]
-    Serve {
+    Start {
         #[arg(
             short = 'H',
             long,
@@ -56,6 +58,18 @@ async fn main() {
 
 async fn run() -> Result<()> {
     let args = App::parse();
+
+    match args.command {
+        Command::Start {
+            host,
+            port,
+            threads,
+            debug,
+            data_folder,
+        } => server::start(&host, port, debug, data_folder, threads)
+            .await
+            .context("Failed to start backend")?,
+    }
 
     Ok(())
 }
