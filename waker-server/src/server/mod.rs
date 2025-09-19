@@ -1,15 +1,18 @@
+mod api;
 mod utils;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use chrono::Local;
-use log::{debug, error, LevelFilter};
+use log::{debug, error, info, LevelFilter};
 use rayon::ThreadPoolBuilder;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode, WriteLogger};
 use std::{
     fs::{create_dir_all, OpenOptions},
+    net::{IpAddr, Ipv4Addr, SocketAddr},
     path::{Path, PathBuf},
     sync::Arc,
 };
+use tokio::net::TcpListener;
 use utils::{get_num_threads, is_env};
 
 const ENV_DEBUG: &str = "DEBUG";
@@ -105,6 +108,22 @@ pub async fn start(
 
 async fn proceed(service: Arc<Service>, host: &str, port: u16) -> Result<()> {
     debug!("service={service:#?}");
+
+    let app = api::routes().with_state(service);
+    let addr = SocketAddr::new(
+        host.parse::<IpAddr>()
+            .unwrap_or(IpAddr::V4(Ipv4Addr::UNSPECIFIED)),
+        port,
+    );
+    let listener = TcpListener::bind(addr)
+        .await
+        .context(anyhow!("Failed to bind to address: {addr}"))?;
+
+    info!("Serving on http://{host}:{port}/");
+
+    axum::serve(listener, app.into_make_service())
+        .await
+        .context("Failed to serve axum app")?;
 
     Ok(())
 }
