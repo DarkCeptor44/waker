@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["waker", "waker-cli"]
+members = ["waker", "waker-cli", "waker-server"]
 
 [workspace.package]
 edition = "2021"
