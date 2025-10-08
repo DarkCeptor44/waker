@@ -2,6 +2,7 @@
 name = "waker-server"
 version = "0.1.0"
 description = "Wake-on-LAN server for Rust"
+publish = false
 license = "GPL-3.0-or-later"
 edition.workspace = true
 authors.workspace = true
