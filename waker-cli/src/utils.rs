@@ -17,8 +17,32 @@
 use crate::types::Machine;
 use colored::Colorize;
 use inquire::validator::Validation;
-use std::str::FromStr;
+use std::{fmt::Write as _, str::FromStr};
 use waker::Mac;
+
+pub fn format_machine_changes(before: &Machine, after: &Machine) -> String {
+    let mut s = String::new();
+
+    if before == after {
+        return s;
+    }
+
+    if before.name != after.name {
+        writeln!(s, "Name: {} -> {}", before.name.red(), after.name.green()).unwrap_or_default();
+    }
+
+    if before.mac != after.mac {
+        writeln!(
+            s,
+            "MAC: {} -> {}",
+            before.mac.to_string().red(),
+            after.mac.to_string().green()
+        )
+        .unwrap_or_default();
+    }
+
+    s
+}
 
 pub fn format_machine_details(machine: &Machine) -> String {
     format!(

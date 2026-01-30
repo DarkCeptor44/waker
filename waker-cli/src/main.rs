@@ -35,8 +35,11 @@
 //! Usage: wake [OPTIONS] [NAME] [COMMAND]
 //!
 //! Commands:
-//!   add   Add machine to the config file
-//!   help  Print this message or the help of the given subcommand(s)
+//!   add     Add machine
+//!   edit    Edit machine
+//!   list    List machines
+//!   remove  Remove one or multiple machine
+//!   help    Print this message or the help of the given subcommand(s)
 //!
 //! Arguments:
 //!   [NAME]  Name of the machine to wake up, if the `-n` option is specified then this is the MAC address to send the magic packet to (must be in format `xx:xx:xx:xx:xx:xx`)
@@ -96,7 +99,10 @@
 //!
 //! ## MSRV
 //!
-//! The Minimum Supported Rust Version (MSRV) for `waker-cli` is **1.80**.
+//! | Crate Version | MSRV |
+//! | ----- | ---- |
+//! | 1.0.x | 1.81 |
+//! | 0.1.x | 1.80 |
 //!
 //! ## License
 //!
@@ -114,10 +120,11 @@ use clap::{Parser, Subcommand};
 use colored::Colorize;
 use configura::{load_config, Config};
 use handy::pattern::{is_close_to_upper_bound, string_similarity};
-use inquire::{Confirm, InquireError, Select, Text};
+use inquire::{Confirm, InquireError, MultiSelect, Select, Text};
 use std::{process::exit, str::FromStr};
+use tabela::{CellStyle, Table};
 use types::{Data, Machine};
-use utils::{format_machine_details, validate_mac, validate_text};
+use utils::{format_machine_changes, format_machine_details, validate_mac, validate_text};
 use waker::{create_magic_packet, wake_device, Mac, WakeOptions};
 
 #[derive(Debug, Parser)]
@@ -157,11 +164,23 @@ struct App {
 
 #[derive(Debug, Subcommand)]
 enum Command {
-    #[command(about = "Add machine to the config file", alias = "a")]
+    #[command(about = "Add machine", alias = "a")]
     Add,
-    // TODO add Edit command
-    // TODO add List command
-    // TODO add Remove command
+
+    #[command(about = "Edit machine", alias = "e")]
+    Edit {
+        #[arg(help = "Name of the machine to edit")]
+        name: Option<String>,
+    },
+
+    #[command(about = "List machines", alias = "l")]
+    List,
+
+    #[command(about = "Remove one or multiple machine", alias = "r")]
+    Remove {
+        #[arg(help = "Names of the machines to remove")]
+        names: Option<Vec<String>>,
+    },
 }
 
 fn main() {
@@ -177,11 +196,13 @@ fn run() -> Result<()> {
 
     match args.name {
         Some(name) => {
+            let default_machine = Machine {
+                name: String::new(),
+                mac: Mac::from_str(&name).context("Invalid MAC address")?,
+            };
+
             let machine = if args.name_as_mac {
-                Machine {
-                    name: String::new(),
-                    mac: Mac::from_str(&name).context("Invalid MAC address")?,
-                }
+                &default_machine
             } else {
                 if config.machines.is_empty() {
                     println!("No machines found in config file");
@@ -196,12 +217,22 @@ fn run() -> Result<()> {
                 }
             };
 
-            wake_machine(&machine, &args.bcast_addr, &args.bind_addr)
+            wake_machine(machine, &args.bcast_addr, &args.bind_addr)
                 .context("Failed to wake machine")?;
         }
 
         None => match args.command {
             Some(Command::Add) => config.add_machine().context("Failed to add machine")?,
+
+            Some(Command::Edit { name }) => config
+                .edit_machine(name)
+                .context("Failed to edit machine")?,
+
+            Some(Command::List) => config.list_machines().context("Failed to list machines")?,
+
+            Some(Command::Remove { names }) => config
+                .remove_machines(names)
+                .context("Failed to remove machines")?,
 
             None => {
                 if config.machines.is_empty() {
@@ -248,7 +279,83 @@ impl Data {
         Ok(())
     }
 
-    fn find_best_machine(&self, name: &str) -> Option<Machine> {
+    fn edit_machine(&mut self, name: Option<String>) -> Result<()> {
+        if self.machines.is_empty() {
+            println!("No machines found in config file");
+            return Ok(());
+        }
+
+        let machine_index = if let Some(name) = name {
+            if let Some(index) = self.find_best_machine_index(&name) {
+                index
+            } else {
+                println!("No machine found with name: {name}");
+                return Ok(());
+            }
+        } else {
+            if let Some(index) = self
+                .prompt_for_machine_index()
+                .context("Failed to prompt for a machine")?
+            {
+                index
+            } else {
+                println!("No machine selected");
+                return Ok(());
+            }
+        };
+
+        let Some(new_machine) = self
+            .prompt_machine(Some(&self.machines[machine_index]))
+            .context("Failed to prompt a machine")?
+        else {
+            return Ok(());
+        };
+
+        if new_machine == self.machines[machine_index] {
+            println!("No changes made");
+            return Ok(());
+        }
+
+        if Confirm::new("Do you want to save the edited machine?")
+            .with_default(false)
+            .with_help_message(&format_machine_changes(
+                &self.machines[machine_index],
+                &new_machine,
+            ))
+            .prompt()?
+        {
+            self.machines[machine_index] = new_machine;
+            self.save().context("Failed to save config file")?;
+
+            println!("{}", "Machine edited successfully".green());
+        } else {
+            println!("Machine not edited");
+        }
+
+        Ok(())
+    }
+
+    fn find_best_machine_index(&self, name: &str) -> Option<usize> {
+        let mut best_score = 0.0;
+        let mut best_match_index = None;
+
+        for (index, machine) in self.machines.iter().enumerate() {
+            let score = string_similarity(&machine.name, name);
+
+            if score > best_score {
+                best_score = score;
+                best_match_index = Some(index);
+            }
+
+            if is_close_to_upper_bound(score) {
+                break;
+            }
+        }
+
+        best_match_index
+    }
+
+    fn find_best_machine(&self, name: &str) -> Option<&Machine> {
         let mut best_score = 0.0;
         let mut best_match = None;
 
@@ -265,7 +372,25 @@ impl Data {
             }
         }
 
-        best_match.cloned()
+        best_match
+    }
+
+    fn list_machines(&self) -> Result<()> {
+        if self.machines.is_empty() {
+            println!("No machines found in config file");
+            return Ok(());
+        }
+
+        let machines: Vec<&Machine> = self.machines.iter().collect();
+        let table = Table::new(&machines)
+            .with_header(&["Name", "MAC"], None, Some(CellStyle::Bold), None)
+            .with_separator("  ");
+
+        println!(
+            "{}",
+            table.format().context("Failed to format machine list")?
+        );
+        Ok(())
     }
 
     fn prompt_machine(&self, existing: Option<&Machine>) -> Result<Option<Machine>> {
@@ -286,6 +411,7 @@ impl Data {
             .machines
             .iter()
             .any(|m| string_similarity(&m.name, &name) > 0.9)
+            && existing.is_none()
         {
             println!("Machine already exists: {name}");
             return Ok(None);
@@ -308,6 +434,93 @@ impl Data {
             name,
             mac: Mac::from_str(&mac).context("Invalid MAC address")?,
         }))
+    }
+
+    fn prompt_for_machine_index(&self) -> Result<Option<usize>> {
+        let machines: Vec<&Machine> = self.machines.iter().collect();
+
+        match Select::new("Choose a machine:", machines).prompt() {
+            Ok(choice) => {
+                let index = self.machines.iter().position(|m| m == choice);
+                Ok(index)
+            }
+            Err(InquireError::OperationInterrupted | InquireError::OperationCanceled) => Ok(None),
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    fn prompt_for_machines_index(&self) -> Result<Option<Vec<usize>>> {
+        let machines: Vec<&Machine> = self.machines.iter().collect();
+
+        match MultiSelect::new("Choose one or multiple machines:", machines).prompt() {
+            Ok(choices) => {
+                let indexes = choices
+                    .iter()
+                    .map(|m| self.machines.iter().position(|m2| m2 == *m).unwrap())
+                    .collect();
+                Ok(Some(indexes))
+            }
+            Err(InquireError::OperationInterrupted | InquireError::OperationCanceled) => Ok(None),
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    fn remove_machines(&mut self, names: Option<Vec<String>>) -> Result<()> {
+        if self.machines.is_empty() {
+            println!("No machines found in config file");
+            return Ok(());
+        }
+
+        let mut indexes_to_remove: Vec<usize> = if let Some(names) = names {
+            names
+                .iter()
+                .filter_map(|n| self.find_best_machine_index(n))
+                .collect()
+        } else {
+            match self.prompt_for_machines_index() {
+                Ok(Some(indexes)) => indexes,
+                Ok(None) => return Ok(()),
+                Err(e) => return Err(e),
+            }
+        };
+
+        if indexes_to_remove.is_empty() {
+            println!("No machines selected or found to remove");
+            return Ok(());
+        }
+
+        let machines_to_remove_str: Vec<&str> = indexes_to_remove
+            .iter()
+            .map(|&i| self.machines[i].name.as_str())
+            .collect();
+        let help_str = format!("\n{}\n", machines_to_remove_str.join(", "));
+
+        if Confirm::new("Do you want to remove these machines?")
+            .with_default(false)
+            .with_help_message(&help_str)
+            .prompt()?
+        {
+            let initial_len = self.machines.len();
+
+            indexes_to_remove.sort_unstable();
+
+            for index in indexes_to_remove.iter().rev() {
+                self.machines.remove(*index);
+            }
+
+            if self.machines.len() == initial_len {
+                println!("No machines removed");
+            } else {
+                self.save().context("Failed to save config file")?;
+
+                println!(
+                    "{}",
+                    format!("Removed {} machines", initial_len - self.machines.len()).green()
+                );
+            }
+        }
+
+        Ok(())
     }
 }
 
