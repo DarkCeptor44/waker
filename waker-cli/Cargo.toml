@@ -13,14 +13,14 @@ categories = ["command-line-utilities", "network-programming"]
 
 [dependencies]
 anyhow.workspace = true
-clap = { version = "^4", features = ["derive"] }
-colored = "^3"
-configura = "^1"
-handy-rs = { version = "^2", features = ["pattern"] }
-inquire = "^0.7"
-serde = { version = "^1", features = ["derive"] }
-tabela = "^0.2"
-waker = { version = "^0.1", path = "../waker", features = ["serde"] }
+clap = { workspace = true, features = ["derive"] }
+colored.workspace = true
+configura.workspace = true
+handy-rs = { workspace = true, features = ["pattern"] }
+inquire.workspace = true
+serde = { workspace = true, features = ["derive"] }
+tabela.workspace = true
+waker.workspace = true
 
 [[bin]]
 name = "wake"
