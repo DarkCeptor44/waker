@@ -1,6 +1,6 @@
 [package]
 name = "waker"
-version = "0.1.0"
+version = "1.0.0"
 description = "Wake-On-LAN library for Rust"
 edition.workspace = true
 rust-version = "1.78"

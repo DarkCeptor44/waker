@@ -14,10 +14,10 @@ Or you can add this to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-waker = "^0.1"
+waker = "1"
 
 # this also works
-waker = { version = "^0.1", git = "https://github.com/DarkCeptor44/waker" }
+waker = { version = "1", git = "https://github.com/DarkCeptor44/waker" }
 ```
 
 ## Features
