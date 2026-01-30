@@ -21,7 +21,7 @@ configura = "1.1.0"
 handy-rs = "2.2.0"
 inquire = "0.9.2"
 tabela = "0.2.0"
-waker = { path = "./waker", features = ["serde"] }
+waker = { version = "1", path = "./waker", features = ["serde"] }
 
 # dev-dependencies
 divan = "0.1.21"
