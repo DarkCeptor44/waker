@@ -196,28 +196,28 @@ fn run() -> Result<()> {
 
     match args.name {
         Some(name) => {
-            let default_machine = Machine {
-                name: String::new(),
-                mac: Mac::from_str(&name).context("Invalid MAC address")?,
-            };
-
-            let machine = if args.name_as_mac {
-                &default_machine
-            } else {
-                if config.machines.is_empty() {
-                    println!("No machines found in config file");
-                    return Ok(());
-                }
-
-                let Some(index) = config.find_best_machine_index(&name) else {
-                    println!("No machine found with name: {name}");
-                    return Ok(());
+            if args.name_as_mac {
+                let machine = Machine {
+                    name: String::new(),
+                    mac: Mac::from_str(&name).context("Invalid MAC address")?,
                 };
 
-                &config.machines[index]
+                wake_machine(&machine, &args.bcast_addr, &args.bind_addr)
+                    .context("Failed to wake machine")?;
+                return Ok(());
+            }
+
+            if config.machines.is_empty() {
+                println!("No machines found in config file");
+                return Ok(());
+            }
+
+            let Some(index) = config.find_best_machine_index(&name) else {
+                println!("No machine found with name: {name}");
+                return Ok(());
             };
 
-            wake_machine(machine, &args.bcast_addr, &args.bind_addr)
+            wake_machine(&config.machines[index], &args.bcast_addr, &args.bind_addr)
                 .context("Failed to wake machine")?;
         }
 
