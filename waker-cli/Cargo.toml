@@ -1,6 +1,6 @@
 [package]
 name = "waker-cli"
-version = "1.0.0"
+version = "1.0.1"
 description = "Wake-On-LAN command line interface for Rust"
 edition.workspace = true
 rust-version = "1.81"
