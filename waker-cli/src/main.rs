@@ -209,12 +209,12 @@ fn run() -> Result<()> {
                     return Ok(());
                 }
 
-                if let Some(mach) = config.find_best_machine(&name) {
-                    mach
-                } else {
+                let Some(index) = config.find_best_machine_index(&name) else {
                     println!("No machine found with name: {name}");
                     return Ok(());
-                }
+                };
+
+                &config.machines[index]
             };
 
             wake_machine(machine, &args.bcast_addr, &args.bind_addr)
@@ -353,26 +353,6 @@ impl Data {
         }
 
         best_match_index
-    }
-
-    fn find_best_machine(&self, name: &str) -> Option<&Machine> {
-        let mut best_score = 0.0;
-        let mut best_match = None;
-
-        for machine in &self.machines {
-            let score = string_similarity(&machine.name, name);
-
-            if score > best_score {
-                best_score = score;
-                best_match = Some(machine);
-            }
-
-            if is_close_to_upper_bound(score) {
-                break;
-            }
-        }
-
-        best_match
     }
 
     fn list_machines(&self) -> Result<()> {
