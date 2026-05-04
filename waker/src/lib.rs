@@ -18,10 +18,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! waker = "1"
+//! waker = "1.1.0"
 //!
 //! # this also works
-//! waker = { version = "1", git = "https://github.com/DarkCeptor44/waker" }
+//! waker = { version = "1.1.0", git = "https://github.com/DarkCeptor44/waker" }
 //! ```
 //!
 //! ## MSRV
