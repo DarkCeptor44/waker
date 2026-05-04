@@ -1,22 +1,9 @@
-// Copyright (C) 2025 DarkCeptor44
-//
-// This file is part of waker.
-//
-// waker is free software: you can redistribute it and/or modify
-// it under theterms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// waker is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with waker.  If not, see <https://www.gnu.org/licenses/>.
+// This Source Code Form is subject to the terms of the
+// Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use std::{net::UdpSocket, time::Duration};
-use waker::{create_magic_packet, wake_device, Mac, WakeOptions};
+use waker::{Mac, WakeOptions, create_magic_packet, wake_device};
 
 const MAC_BYTES: [u8; 6] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xAB];
 const EXPECTED_PACKET: [u8; 102] = [

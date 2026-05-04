@@ -115,4 +115,4 @@ packet_send     fastest       │ slowest       │ median        │ mean      
 
 ## License
 
-This project is licensed under the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html).
+This project is licensed under the [Mozilla Public License](https://www.mozilla.org/en-US/MPL/2.0/), version 2.0. See the [LICENSE](LICENSE) file for details.
