@@ -20,13 +20,15 @@ waker = "1"
 waker = { version = "1", git = "https://github.com/DarkCeptor44/waker" }
 ```
 
+## MSRV
+
+| Version | Edition | MSRV |
+| --- | --- | --- |
+| <=1.0.0 | 2021 | 1.78 |
+
 ## Features
 
 - `serde`: Enables serialization and deserialization of the `Mac` and `MagicPacket` types.
-
-## MSRV
-
-The Minimum Supported Rust Version (MSRV) for `waker` is **1.78**.
 
 ## Usage
 

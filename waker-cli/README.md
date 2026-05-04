@@ -12,10 +12,10 @@ You can install the application from:
 
 ## MSRV
 
-| Crate Version | MSRV |
-| ----- | ---- |
-| 1.0.x | 1.81 |
-| 0.1.x | 1.80 |
+| Crate Version | Edition | MSRV |
+| --- | --- | --- |
+| 1.0.0 - 1.0.1 | 2021 | 1.81 |
+| 0.1.0 | 2021 | 1.80 |
 
 ## Usage
 
