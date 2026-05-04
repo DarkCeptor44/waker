@@ -46,6 +46,10 @@ Options:
   -V, --version                  Print version
 ```
 
+## Audits
+
+See [Audits](../README.md#audits).
+
 ## Benchmarks
 
 The CLI was benchmarked using [Hyperfine](https://github.com/sharkdp/hyperfine). The profiles used were:
