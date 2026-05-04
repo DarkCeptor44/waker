@@ -1,11 +1,13 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = ["waker", "waker-cli"]
 
 [workspace.package]
 edition = "2021"
 version = "1.0.1"
 authors = ["DarkCeptor44"]
+edition = "2024"
+rust-version = "1.85"
 homepage = "https://github.com/DarkCeptor44/waker"
 repository = "https://github.com/DarkCeptor44/waker"
 

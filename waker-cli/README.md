@@ -14,6 +14,7 @@ You can install the application from:
 
 | Crate Version | Edition | MSRV |
 | --- | --- | --- |
+| 1.1.0 | 2024 | 1.85 |
 | 1.0.0 - 1.0.1 | 2021 | 1.81 |
 | 0.1.0 | 2021 | 1.80 |
 

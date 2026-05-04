@@ -24,6 +24,7 @@ waker = { version = "1", git = "https://github.com/DarkCeptor44/waker" }
 
 | Version | Edition | MSRV |
 | --- | --- | --- |
+| 1.1.0 | 2024 | 1.85 |
 | <=1.0.0 | 2021 | 1.78 |
 
 ## Features
