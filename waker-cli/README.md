@@ -12,7 +12,11 @@ You can install the application from:
 
 ## MSRV
 
-The Minimum Supported Rust Version (MSRV) for `waker-cli` is **1.80**.
+| Crate Version | Edition | MSRV |
+| --- | --- | --- |
+| 1.1.0 | 2024 | 1.85 |
+| 1.0.0 - 1.0.1 | 2021 | 1.81 |
+| 0.1.0 | 2021 | 1.80 |
 
 ## Usage
 
@@ -25,8 +29,11 @@ Wake-On-LAN command line interface for Rust
 Usage: wake [OPTIONS] [NAME] [COMMAND]
 
 Commands:
-  add   Add machine to the config file
-  help  Print this message or the help of the given subcommand(s)
+  add     Add machine
+  edit    Edit machine
+  list    List machines
+  remove  Remove one or multiple machine
+  help    Print this message or the help of the given subcommand(s)
 
 Arguments:
   [NAME]  Name of the machine to wake up, if the `-n` option is specified then this is the MAC address to send the magic packet to (must be in format `xx:xx:xx:xx:xx:xx`)
@@ -38,6 +45,10 @@ Options:
   -h, --help                     Print help
   -V, --version                  Print version
 ```
+
+## Audits
+
+See [Audits](../README.md#audits).
 
 ## Benchmarks
 

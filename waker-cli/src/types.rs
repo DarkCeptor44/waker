@@ -17,6 +17,7 @@
 use configura::{formats::JsonFormat, Config};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
+use tabela::{Cell, Color, Row};
 use waker::Mac;
 
 const CONFIG_NAME: &str = "waker";
@@ -44,5 +45,14 @@ pub struct Machine {
 impl Display for Machine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
+    }
+}
+
+impl Row for &Machine {
+    fn as_row(&self) -> Vec<Cell> {
+        vec![
+            Cell::new(&self.name).with_color(Color::Green),
+            Cell::new(self.mac).with_color(Color::Cyan),
+        ]
     }
 }

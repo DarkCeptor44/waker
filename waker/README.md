@@ -14,19 +14,22 @@ Or you can add this to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-waker = "^0.1"
+waker = "1.1.0"
 
 # this also works
-waker = { version = "^0.1", git = "https://github.com/DarkCeptor44/waker" }
+waker = { version = "1.1.0", git = "https://github.com/DarkCeptor44/waker" }
 ```
+
+## MSRV
+
+| Version | Edition | MSRV |
+| --- | --- | --- |
+| 1.1.0 | 2024 | 1.85 |
+| <=1.0.0 | 2021 | 1.78 |
 
 ## Features
 
 - `serde`: Enables serialization and deserialization of the `Mac` and `MagicPacket` types.
-
-## MSRV
-
-The Minimum Supported Rust Version (MSRV) for `waker` is **1.78**.
 
 ## Usage
 
@@ -71,7 +74,7 @@ wake_device(WakeOptions::new(&packet).bind_address("127.0.0.1:0")).unwrap();
 
 ## Audits
 
-No vulnerabilities found according to [cargo-audit](https://crates.io/crates/cargo-audit/)
+See [Audits](../README.md#audits).
 
 ## Testing
 
@@ -112,4 +115,4 @@ packet_send     fastest       │ slowest       │ median        │ mean      
 
 ## License
 
-This project is licensed under the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html).
+This project is licensed under the [Mozilla Public License](https://www.mozilla.org/en-US/MPL/2.0/), version 2.0. See the [LICENSE](LICENSE) file for details.
