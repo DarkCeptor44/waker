@@ -78,7 +78,11 @@
 //!
 //! ## Audits
 //!
-//! No vulnerabilities found according to [cargo-audit](https://crates.io/crates/cargo-audit/)
+//! From [cargo-audit](https://crates.io/crates/cargo-audit):
+//!
+//! | Version | Vulnerabilities |
+//! | --- | --- |
+//! | <=1.1.0 | 0 |
 //!
 //! ## Benchmarks
 //!

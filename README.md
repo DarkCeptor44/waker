@@ -11,4 +11,4 @@ From [cargo-audit](https://crates.io/crates/cargo-audit):
 
 | Version | Vulnerabilities |
 | --- | --- |
-| <=1.0.0 | 0 |
+| <=1.1.0 | 0 |
