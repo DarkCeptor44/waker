@@ -1,6 +1,6 @@
 [package]
 name = "waker-cli"
-version = "1.0.1"
+version.workspace = true
 description = "Wake-On-LAN command line interface for Rust"
 edition.workspace = true
 rust-version = "1.81"
@@ -20,7 +20,7 @@ handy-rs = { workspace = true, features = ["pattern"] }
 inquire.workspace = true
 serde = { workspace = true, features = ["derive"] }
 tabela.workspace = true
-waker.workspace = true
+waker = { workspace = true, features = ["serde"] }
 
 [[bin]]
 name = "wake"
